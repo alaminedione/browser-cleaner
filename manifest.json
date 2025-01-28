@@ -1,9 +1,10 @@
+// manifest.json (version corrigée)
 {
   "manifest_version": 3,
-  "name": "Clean Data Except Bookmarks",
-  "version": "1.0",
-  "description": "Supprime les données des sites non bookmarqués",
-  "permissions": ["bookmarks", "browsingData"],
+  "name": "Clean Data - Bookmarks Whitelist",
+  "version": "1.1",
+  "description": "Supprime toutes les données sauf celles des bookmarks",
+  "permissions": ["bookmarks", "browsingData", "notifications"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
@@ -11,7 +12,8 @@
   "icons": {
     "128": "icon.png"
   },
-  "background": {
-    "service_worker": "background.js"
+   "background": {
+    "service_worker": "background.js",
+    "type": "module"
   }
 }

@@ -1,20 +1,36 @@
-// popup.js
-document.getElementById('cleanButton').addEventListener('click', async () => {
-  const bookmarks = await chrome.bookmarks.getTree();
-  const urls = extractUrls(bookmarks);
-  chrome.runtime.sendMessage({ action: "cleanData", urls });
-});
-
-function extractUrls(nodes) {
-  let domains = [];
-  nodes.forEach(node => {
-    if (node.url) {
-      const url = new URL(node.url);
-      domains.push(url.hostname);
-      // Inclure le domaine racine (ex: "example.com" pour "blog.example.com")
-      domains.push(url.hostname.split('.').slice(-2).join('.'));
-    }
-    if (node.children) domains = domains.concat(extractUrls(node.children));
-  });
-  return [...new Set(domains)];
+// popup.js (version corrigée)
+async function getBookmarkOrigins() {
+  const nodes = await chrome.bookmarks.getTree();
+  return extractOrigins(nodes);
 }
+
+function extractOrigins(nodes) {
+  const origins = new Set();
+  
+  function processNode(node) {
+    if (node.url) {
+      try {
+        const url = new URL(node.url);
+        origins.add(url.origin);
+        // Ajoute le domaine parent pour les sous-domaines
+        const domainParts = url.hostname.split('.');
+        if (domainParts.length > 2) {
+          origins.add(`https://${domainParts.slice(-2).join('.')}`);
+          origins.add(`http://${domainParts.slice(-2).join('.')}`);
+        }
+      } catch (e) {
+        console.error('URL invalide:', node.url);
+      }
+    }
+    node.children?.forEach(processNode);
+  }
+
+  nodes.forEach(processNode);
+  return Array.from(origins);
+}
+
+document.getElementById('cleanButton').addEventListener('click', async () => {
+  const origins = await getBookmarkOrigins();
+  console.log(origins);
+  chrome.runtime.sendMessage({ action: "clean", origins });
+});
