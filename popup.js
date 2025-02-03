@@ -6,7 +6,7 @@ async function getBookmarkOrigins() {
 
 function extractOrigins(nodes) {
   const origins = new Set();
-  
+
   function processNode(node) {
     if (node.url) {
       try {
@@ -31,6 +31,17 @@ function extractOrigins(nodes) {
 
 document.getElementById('cleanButton').addEventListener('click', async () => {
   const origins = await getBookmarkOrigins();
-  console.log(origins);
-  chrome.runtime.sendMessage({ action: "clean", origins });
+
+  // Établir une connexion persistante
+  const port = chrome.runtime.connect({ name: "clean-port" });
+  port.postMessage({ action: "clean", origins });
+
+  // Gérer la réponse
+  port.onMessage.addListener((msg) => {
+    if (msg.status === "done") {
+      alert("Cleaning done!");
+    }
+  });
 });
+
+

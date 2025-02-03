@@ -1,0 +1,45 @@
+/* style.css */
+/* style.css */
+body {
+  width: 250px;
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+  background-color: #f0f4f8; /* Gris clair très doux */
+  text-align: center;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+button {
+  padding: 12px;
+  width: 100%;
+  background-color: #00bcd4; /* Bleu cyan vif */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #0097a7; /* Bleu cyan plus foncé */
+  transform: scale(1.05); /* Effet de zoom */
+}
+
+button:active {
+  background-color: #00838f; /* Bleu plus foncé au clic */
+}
+
+/* Canvas pour l'animation de suppression */
+canvas {
+  display: none; /* Le canvas est caché par défaut */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
