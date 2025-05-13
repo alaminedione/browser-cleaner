@@ -1,19 +1,20 @@
 /* style.css */
 /* style.css */
 body {
-  width: 250px;
+  width: 300px; /* Increased width for better readability */
   padding: 20px;
   font-family: "Arial", sans-serif;
-  background-color: #f0f4f8; /* Gris clair très doux */
+  background-color: #f0f4f8; /* Light grey */
   text-align: center;
   box-sizing: border-box;
   margin: 0;
+  color: #333; /* Default text color */
 }
 
 button {
   padding: 12px;
   width: 100%;
-  background-color: #00bcd4; /* Bleu cyan vif */
+  background-color: #00bcd4; /* Teal */
   color: white;
   border: none;
   border-radius: 8px;
@@ -22,24 +23,62 @@ button {
   transition:
     background-color 0.3s ease,
     transform 0.2s ease;
+  margin-bottom: 15px; /* Added space below button */
 }
 
 button:hover {
-  background-color: #0097a7; /* Bleu cyan plus foncé */
-  transform: scale(1.05); /* Effet de zoom */
+  background-color: #0097a7; /* Darker teal */
+  transform: scale(1.02); /* Subtle zoom effect */
 }
 
 button:active {
-  background-color: #00838f; /* Bleu plus foncé au clic */
+  background-color: #00838f; /* Even darker teal */
 }
 
-/* Canvas pour l'animation de suppression */
-canvas {
-  display: none; /* Le canvas est caché par défaut */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
+#statusMessage {
+  font-style: italic;
+  color: #555;
+}
+
+#results {
+  margin-top: 15px;
+  text-align: left;
+  border-top: 1px solid #ccc;
+  padding-top: 15px;
+}
+
+#results p {
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+#results p[style*="color: green"] {
+  background-color: #e8f5e9; /* Light green background */
+  border: 1px solid #4caf50; /* Green border */
+}
+
+#results p[style*="color: red"] {
+  background-color: #ffebee; /* Light red background */
+  border: 1px solid #f44336; /* Red border */
+}
+
+#results p[style*="color: orange"] {
+  background-color: #fff3e0; /* Light orange background */
+  border: 1px solid #ff9800; /* Orange border */
+}
+
+#results ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+#results li {
+  background-color: #e0e0e0; /* Light grey background for list items */
+  padding: 5px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  word-break: break-all; /* Break long URLs */
 }

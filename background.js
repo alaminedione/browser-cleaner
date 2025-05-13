@@ -11,16 +11,28 @@ chrome.runtime.onConnect.addListener((port) => {
         cache: true,
         indexedDB: true
       }, () => {
-        // Envoyer un accusé de réception
-        port.postMessage({ status: "done" });
-        chrome.notifications.create({
-          type: 'basic',
-          iconUrl: 'icon.png',
-          title: 'Succefully cleaned',
-          message: `Your browsing data has been cleaned successfully! (except data from ${Math.floor(origins.length / 2)} sites in your bookmarks)`
-        });
+        if (chrome.runtime.lastError) {
+          console.error("Error during browsing data removal:", chrome.runtime.lastError.message);
+          port.postMessage({ status: "error", message: chrome.runtime.lastError.message });
+          // Optionally, show a notification about the error
+          chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'icon.png',
+            title: 'Cleaning Failed',
+            message: `An error occurred during data cleaning: ${chrome.runtime.lastError.message}`
+          });
+        } else {
+          // Envoyer un accusé de réception
+          port.postMessage({ status: "done" });
+          chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'icon.png',
+            title: 'Nettoyage réussi',
+            message: `Vos données de navigation ont été nettoyées avec succès ! (sauf les données de ${origins.length} sites dans vos favoris)`
+          });
 
-        console.log("all data has been removed except data from " + Math.floor(origins.length / 2) + " sites in your bookmarks");
+          console.log(`All data has been removed except data from ${origins.length} sites in your bookmarks`);
+        }
       });
     }
   });
