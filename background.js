@@ -3,6 +3,7 @@ chrome.runtime.onConnect.addListener((port) => {
 
   port.onMessage.addListener(({ action, origins }) => {
     if (action === "clean") {
+      const startTime = new Date().toISOString();
       chrome.browsingData.remove({
         excludeOrigins: origins,
         originTypes: { unprotectedWeb: true }
@@ -11,10 +12,21 @@ chrome.runtime.onConnect.addListener((port) => {
         cache: true,
         indexedDB: true
       }, () => {
+        const endTime = new Date().toISOString();
+        const logDetails = {
+          startTime,
+          endTime,
+          originsExcluded: origins.length,
+          itemsRemoved: ['cookies', 'cache', 'indexedDB'],
+          error: null,
+          errorMessage: null
+        };
+
         if (chrome.runtime.lastError) {
           console.error("Error during browsing data removal:", chrome.runtime.lastError.message);
-          port.postMessage({ status: "error", message: chrome.runtime.lastError.message });
-          // Optionally, show a notification about the error
+          logDetails.error = true;
+          logDetails.errorMessage = chrome.runtime.lastError.message;
+          port.postMessage({ status: "error", message: chrome.runtime.lastError.message, log: logDetails });
           chrome.notifications.create({
             type: 'basic',
             iconUrl: 'icon.png',
@@ -22,15 +34,13 @@ chrome.runtime.onConnect.addListener((port) => {
             message: `An error occurred during data cleaning: ${chrome.runtime.lastError.message}`
           });
         } else {
-          // Envoyer un accusé de réception
-          port.postMessage({ status: "done" });
+          port.postMessage({ status: "done", log: logDetails });
           chrome.notifications.create({
             type: 'basic',
             iconUrl: 'icon.png',
             title: 'Nettoyage réussi',
             message: `Vos données de navigation ont été nettoyées avec succès ! (sauf les données de ${origins.length} sites dans vos favoris)`
           });
-
           console.log(`All data has been removed except data from ${origins.length} sites in your bookmarks`);
         }
       });
