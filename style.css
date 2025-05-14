@@ -1,84 +1,465 @@
-/* style.css */
-/* style.css */
-body {
-  width: 300px; /* Increased width for better readability */
-  padding: 20px;
-  font-family: "Arial", sans-serif;
-  background-color: #f0f4f8; /* Light grey */
-  text-align: center;
-  box-sizing: border-box;
+/**
+ * Browser Cleaner - Styles
+ * Feuille de style pour l'interface utilisateur de l'extension
+ */
+
+/* Variables pour les couleurs et dimensions */
+:root {
+  --primary-color: #4a6ee0;
+  --primary-hover: #3a5ecd;
+  --primary-active: #2b4fbf;
+  --secondary-color: #f9fafe;
+  --text-color: #333;
+  --light-text: #666;
+  --success-color: #28a745;
+  --warning-color: #ffc107;
+  --error-color: #dc3545;
+  --info-color: #17a2b8;
+  --border-color: #e0e0e0;
+  --hover-bg: #f5f7fd;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --radius: 8px;
+  --transition: 0.2s ease-in-out;
+  --stats-bg: #f0f4ff;
+}
+
+/* Reset et styles de base */
+* {
   margin: 0;
-  color: #333; /* Default text color */
-}
-
-button {
-  padding: 12px;
-  width: 100%;
-  background-color: #00bcd4; /* Teal */
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition:
-    background-color 0.3s ease,
-    transform 0.2s ease;
-  margin-bottom: 15px; /* Added space below button */
-}
-
-button:hover {
-  background-color: #0097a7; /* Darker teal */
-  transform: scale(1.02); /* Subtle zoom effect */
-}
-
-button:active {
-  background-color: #00838f; /* Even darker teal */
-}
-
-#statusMessage {
-  font-style: italic;
-  color: #555;
-}
-
-#results {
-  margin-top: 15px;
-  text-align: left;
-  border-top: 1px solid #ccc;
-  padding-top: 15px;
-}
-
-#results p {
-  margin-bottom: 8px;
-  padding: 8px;
-  border-radius: 4px;
-}
-
-#results p[style*="color: green"] {
-  background-color: #e8f5e9; /* Light green background */
-  border: 1px solid #4caf50; /* Green border */
-}
-
-#results p[style*="color: red"] {
-  background-color: #ffebee; /* Light red background */
-  border: 1px solid #f44336; /* Red border */
-}
-
-#results p[style*="color: orange"] {
-  background-color: #fff3e0; /* Light orange background */
-  border: 1px solid #ff9800; /* Orange border */
-}
-
-#results ul {
-  list-style: none;
   padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+  width: 350px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+/* Conteneur principal */
+.container {
+  padding: 16px;
+}
+
+/* En-tête */
+h1 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  margin-right: 8px;
+}
+
+h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 12px 0 8px;
+}
+
+h3 {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 10px 0 6px;
+  color: var(--light-text);
+}
+
+/* Boutons */
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-button {
+  background-color: var(--primary-color);
+  color: white;
+  width: 100%;
+  padding: 12px;
+}
+
+.primary-button:hover {
+  background-color: var(--primary-hover);
+}
+
+.primary-button:active {
+  background-color: var(--primary-active);
+}
+
+.primary-button:disabled {
+  background-color: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 1px solid var(--border-color);
+  font-size: 12px;
+  padding: 6px 12px;
+}
+
+.secondary-button:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Icons in buttons */
+.icon {
+  margin-right: 6px;
+}
+
+/* Panneau principal */
+.main-panel {
+  margin-bottom: 20px;
+}
+
+/* Status message */
+.status {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: var(--radius);
+  font-weight: 500;
+  text-align: center;
+  min-height: 22px;
+}
+
+.status-info {
+  background-color: rgba(23, 162, 184, 0.1);
+  color: var(--info-color);
+}
+
+.status-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: var(--success-color);
+}
+
+.status-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: var(--warning-color);
+}
+
+.status-error {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--error-color);
+}
+
+/* Paramètres */
+.settings {
+  background-color: var(--secondary-color);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.settings-section {
+  margin-bottom: 12px;
+}
+
+/* Toggle containers */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  cursor: pointer;
+}
+
+.toggle-label {
+  margin-left: 8px;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  position: relative;
+  width: 36px;
+  height: 18px;
+  appearance: none;
+  background-color: #ddd;
+  border-radius: 18px;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background-color: white;
+  transition: var(--transition);
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--primary-color);
+}
+
+input[type="checkbox"]:checked::before {
+  left: 20px;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  border-radius: 3px;
+}
+
+.checkbox-group input[type="checkbox"]::before {
+  display: none;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  background-color: var(--primary-color);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>');
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Stats panel */
+.stats-panel {
+  background-color: var(--stats-bg);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
   margin-top: 10px;
 }
 
-#results li {
-  background-color: #e0e0e0; /* Light grey background for list items */
-  padding: 5px;
-  margin-bottom: 5px;
-  border-radius: 3px;
-  font-size: 0.9em;
-  word-break: break-all; /* Break long URLs */
+.stat-item {
+  text-align: center;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius);
+}
+
+.stat-number {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--light-text);
+}
+
+/* Conteneur de résultats */
+.results-container {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  margin-top: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Résultats */
+.result-info,
+.result-success,
+.result-warning,
+.result-error {
+  padding: 8px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+}
+
+.result-info {
+  background-color: rgba(23, 162, 184, 0.1);
+  color: var(--info-color);
+}
+
+.result-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  color: var(--success-color);
+}
+
+.result-warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  color: var(--warning-color);
+}
+
+.result-error {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--error-color);
+}
+
+/* Listes */
+ul.list-info,
+ul.list-warning,
+ul.list-error {
+  list-style-type: none;
+  margin: 8px 0;
+  padding: 0 8px;
+  font-size: 13px;
+}
+
+ul.list-info li,
+ul.list-warning li,
+ul.list-error li {
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+ul.list-info li {
+  color: var(--info-color);
+}
+
+ul.list-warning li {
+  color: var(--warning-color);
+}
+
+ul.list-error li {
+  color: var(--error-color);
+}
+
+/* Effets de survol */
+.hoverable:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Animation de chargement */
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}
+
+.loading {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Footer styles */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.github-link {
+  display: flex;
+  align-items: center;
+  color: var(--light-text);
+  text-decoration: none;
+  font-size: 12px;
+  transition: var(--transition);
+}
+
+.github-link:hover {
+  color: var(--primary-color);
+}
+
+/* Mode sombre */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #5d7ce4;
+    --primary-hover: #748eec;
+    --primary-active: #4a69cf;
+    --secondary-color: #2a2d3e;
+    --text-color: #e0e0e0;
+    --light-text: #b0b0b0;
+    --border-color: #3a3e50;
+    --hover-bg: #343748;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --stats-bg: #292d3e;
+  }
+
+  body {
+    background-color: #1e2030;
+  }
+
+  .stat-item {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .status-info {
+    background-color: rgba(23, 162, 184, 0.2);
+  }
+
+  .status-success {
+    background-color: rgba(40, 167, 69, 0.2);
+  }
+
+  .status-warning {
+    background-color: rgba(255, 193, 7, 0.2);
+  }
+
+  .status-error {
+    background-color: rgba(220, 53, 69, 0.2);
+  }
+
+  .result-info {
+    background-color: rgba(23, 162, 184, 0.2);
+  }
+
+  .result-success {
+    background-color: rgba(40, 167, 69, 0.2);
+  }
+
+  .result-warning {
+    background-color: rgba(255, 193, 7, 0.2);
+  }
+
+  .result-error {
+    background-color: rgba(220, 53, 69, 0.2);
+  }
+
+  input[type="checkbox"] {
+    background-color: #3a3e50;
+  }
+}
+
+/* Styles responsifs */
+@media (max-width: 300px) {
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
 }

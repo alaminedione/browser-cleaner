@@ -1,49 +1,216 @@
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name !== "clean-port") return;
-
-  port.onMessage.addListener(({ action, origins }) => {
-    if (action === "clean") {
-      const startTime = new Date().toISOString();
-      chrome.browsingData.remove({
-        excludeOrigins: origins,
-        originTypes: { unprotectedWeb: true }
-      }, {
-        cookies: true,
-        cache: true,
-        indexedDB: true
-      }, () => {
-        const endTime = new Date().toISOString();
-        const logDetails = {
-          startTime,
-          endTime,
-          originsExcluded: origins.length,
-          itemsRemoved: ['cookies', 'cache', 'indexedDB'],
-          error: null,
-          errorMessage: null
-        };
-
-        if (chrome.runtime.lastError) {
-          console.error("Error during browsing data removal:", chrome.runtime.lastError.message);
-          logDetails.error = true;
-          logDetails.errorMessage = chrome.runtime.lastError.message;
-          port.postMessage({ status: "error", message: chrome.runtime.lastError.message, log: logDetails });
-          chrome.notifications.create({
-            type: 'basic',
-            iconUrl: 'icon.png',
-            title: 'Cleaning Failed',
-            message: `An error occurred during data cleaning: ${chrome.runtime.lastError.message}`
-          });
-        } else {
-          port.postMessage({ status: "done", log: logDetails });
-          chrome.notifications.create({
-            type: 'basic',
-            iconUrl: 'icon.png',
-            title: 'Nettoyage réussi',
-            message: `Vos données de navigation ont été nettoyées avec succès ! (sauf les données de ${origins.length} sites dans vos favoris)`
-          });
-          console.log(`All data has been removed except data from ${origins.length} sites in your bookmarks`);
-        }
-      });
+// Configuration globale
+const CONFIG = {
+  notificationIcons: {
+    success: 'icon-success.png',
+    error: 'icon-error.png',
+    progress: 'icon-progress.png'
+  },
+  defaultDataTypes: {
+    cookies: true,
+    cache: true,
+    indexedDB: true,
+    localStorage: true,  // Ajout du localStorage
+    serviceWorkers: true // Ajout des service workers
+  },
+  i18n: {
+    fr: {
+      cleaningStarted: 'Nettoyage en cours...',
+      cleaningSuccess: 'Nettoyage réussi',
+      cleaningSuccessDetail: (excludedCount) =>
+        `Vos données de navigation ont été nettoyées avec succès ! (${excludedCount} sites favoris préservés)`,
+      cleaningFailed: 'Échec du nettoyage',
+      cleaningFailedDetail: (error) => `Une erreur est survenue : ${error}`
+    },
+    en: {
+      cleaningStarted: 'Cleaning in progress...',
+      cleaningSuccess: 'Cleaning completed',
+      cleaningSuccessDetail: (excludedCount) =>
+        `Your browsing data has been successfully cleaned! (${excludedCount} bookmarked sites preserved)`,
+      cleaningFailed: 'Cleaning failed',
+      cleaningFailedDetail: (error) => `An error occurred: ${error}`
     }
+  },
+  logLevel: 'info' // 'debug', 'info', 'warn', 'error'
+};
+
+// Utilitaires
+const Utils = {
+  logger: {
+    debug: (message, data) => {
+      if (CONFIG.logLevel === 'debug') {
+        console.debug(`[Browser Cleaner] ${message}`, data || '');
+      }
+    },
+    info: (message, data) => {
+      if (['debug', 'info'].includes(CONFIG.logLevel)) {
+        console.info(`[Browser Cleaner] ${message}`, data || '');
+      }
+    },
+    warn: (message, data) => {
+      if (['debug', 'info', 'warn'].includes(CONFIG.logLevel)) {
+        console.warn(`[Browser Cleaner] ${message}`, data || '');
+      }
+    },
+    error: (message, error) => {
+      if (['debug', 'info', 'warn', 'error'].includes(CONFIG.logLevel)) {
+        console.error(`[Browser Cleaner] ${message}`, error || '');
+      }
+    }
+  },
+  getLanguage: () => {
+    const userLang = chrome.i18n.getUILanguage().split('-')[0];
+    return CONFIG.i18n[userLang] ? userLang : 'en';
+  },
+  getText: (key, ...params) => {
+    const lang = Utils.getLanguage();
+    const text = CONFIG.i18n[lang][key];
+    if (typeof text === 'function') {
+      return text(...params);
+    }
+    return text;
+  },
+  showNotification: (type, title, message) => {
+    chrome.notifications.create({
+      type: 'basic',
+      iconUrl: CONFIG.notificationIcons[type] || 'icon.png',
+      title: title,
+      message: message
+    });
+  }
+};
+
+// Service de nettoyage des données
+const CleaningService = {
+  // Affiche une notification de progression
+  showProgressNotification() {
+    Utils.showNotification(
+      'progress',
+      Utils.getText('cleaningStarted'),
+      ''
+    );
+  },
+
+  // Traite les résultats du nettoyage
+  handleCleaningResult(port, startTime, excludedOrigins, dataTypes, error = null) {
+    const endTime = new Date().toISOString();
+    const logDetails = {
+      operation: 'browsing-data-cleanup',
+      startTime,
+      endTime,
+      duration: new Date(endTime) - new Date(startTime),
+      excludedOrigins: {
+        count: excludedOrigins.length,
+        domains: excludedOrigins
+      },
+      dataTypesRemoved: Object.keys(dataTypes).filter(key => dataTypes[key]),
+      success: !error,
+      error: error ? {
+        message: error.message,
+        stack: error.stack
+      } : null
+    };
+
+    Utils.logger.info('Cleaning operation completed', logDetails);
+
+    if (error) {
+      Utils.showNotification(
+        'error',
+        Utils.getText('cleaningFailed'),
+        Utils.getText('cleaningFailedDetail', error.message)
+      );
+      port.postMessage({ status: "error", message: error.message, log: logDetails });
+    } else {
+      Utils.showNotification(
+        'success',
+        Utils.getText('cleaningSuccess'),
+        Utils.getText('cleaningSuccessDetail', excludedOrigins.length)
+      );
+      port.postMessage({ status: "done", log: logDetails });
+    }
+  },
+
+  // Exécute le nettoyage
+  async executeCleanup(port, options) {
+    const { origins = [], dataTypes = CONFIG.defaultDataTypes } = options;
+    const startTime = new Date().toISOString();
+
+    try {
+      // Afficher une notification de progression
+      this.showProgressNotification();
+
+      Utils.logger.info('Starting browsing data cleanup', {
+        excludedOrigins: origins.length,
+        dataTypes
+      });
+
+      // Valider les origines exclues
+      const validOrigins = origins.filter(origin => {
+        const isValid = typeof origin === 'string' && origin.trim().length > 0;
+        if (!isValid) Utils.logger.warn(`Invalid origin excluded: ${origin}`);
+        return isValid;
+      });
+
+      // Effectuer le nettoyage
+      await new Promise((resolve, reject) => {
+        chrome.browsingData.remove({
+          excludeOrigins: validOrigins,
+          originTypes: { unprotectedWeb: true }
+        }, dataTypes, () => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve();
+          }
+        });
+      });
+
+      // Traiter le résultat
+      this.handleCleaningResult(port, startTime, validOrigins, dataTypes);
+    } catch (error) {
+      Utils.logger.error('Error during browsing data cleanup', error);
+      this.handleCleaningResult(port, startTime, origins, dataTypes, error);
+    }
+  }
+};
+
+// Initialisation et écouteurs d'événements
+function initBrowserCleaner() {
+  // Écouter les connections port
+  chrome.runtime.onConnect.addListener((port) => {
+    if (port.name !== "clean-port") return;
+
+    Utils.logger.info('Connected to cleanup port');
+
+    // Écouter les messages sur ce port
+    port.onMessage.addListener((message) => {
+      Utils.logger.debug('Received message on cleanup port', message);
+
+      const { action, origins = [], dataTypes } = message;
+
+      if (action === "clean") {
+        CleaningService.executeCleanup(port, {
+          origins,
+          dataTypes: dataTypes || CONFIG.defaultDataTypes
+        });
+      } else if (action === "getConfig") {
+        port.postMessage({
+          status: "config",
+          config: CONFIG
+        });
+      }
+    });
+
+    // Gérer la déconnexion
+    port.onDisconnect.addListener(() => {
+      Utils.logger.info('Cleanup port disconnected');
+      if (chrome.runtime.lastError) {
+        Utils.logger.error('Port error:', chrome.runtime.lastError);
+      }
+    });
   });
-});
+
+  Utils.logger.info('Browser cleaner initialized');
+}
+
+// Démarrer le service
+initBrowserCleaner();

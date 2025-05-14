@@ -1,137 +1,389 @@
-// popup.js (version corrigée)
-async function getBookmarkOrigins() {
-  const nodes = await chrome.bookmarks.getTree();
-  return extractOrigins(nodes);
-}
+/**
+ * Browser Cleaner - Popup Script
+ * Interface utilisateur permettant de nettoyer les données de navigation
+ * tout en préservant les données des sites en favoris
+ */
 
-function extractOrigins(nodes) {
-  const origins = new Set();
-  const invalidUrls = [];
-
-  function processNode(node) {
-    if (node.url) {
-      try {
-        const url = new URL(node.url);
-        origins.add(url.origin);
-        // Ajoute le domaine parent pour les sous-domaines
-        const domainParts = url.hostname.split('.');
-        if (domainParts.length > 2) {
-          origins.add(`https://${domainParts.slice(-2).join('.')}`);
-          origins.add(`http://${domainParts.slice(-2).join('.')}`);
-        }
-      } catch (e) {
-        console.error('URL invalide:', node.url, e);
-        invalidUrls.push(node.url);
-      }
+// Gestionnaire des favoris
+const BookmarkManager = {
+  /**
+   * Récupère toutes les origines des URL en favoris
+   * @returns {Promise<{origins: string[], invalidUrls: string[]}>}
+   */
+  async getBookmarkOrigins() {
+    try {
+      const nodes = await chrome.bookmarks.getTree();
+      return this.extractOrigins(nodes);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des favoris:", error);
+      throw new Error(`Impossible d'accéder aux favoris: ${error.message}`);
     }
-    node.children?.forEach(processNode);
+  },
+
+  /**
+   * Extrait les origines à partir des nœuds de favoris
+   * @param {Array} nodes - Nœuds de favoris
+   * @returns {{origins: string[], invalidUrls: string[]}}
+   */
+  extractOrigins(nodes) {
+    const origins = new Set();
+    const invalidUrls = [];
+    const processedDomains = new Set(); // Pour éviter le traitement en double des domaines
+
+    // Traite un nœud de façon récursive
+    const processNode = (node) => {
+      if (node.url) {
+        try {
+          const url = new URL(node.url);
+
+          // Ajouter l'origine exacte
+          origins.add(url.origin);
+
+          // Traitement des sous-domaines et domaines parents
+          const hostname = url.hostname;
+          if (!processedDomains.has(hostname)) {
+            processedDomains.add(hostname);
+
+            // Ajouter le domaine parent pour les sous-domaines
+            const domainParts = hostname.split('.');
+
+            // Traitement différent selon le nombre de parties
+            if (domainParts.length > 2) {
+              // Pour les sous-domaines (ex: sub.example.com)
+              const mainDomain = domainParts.slice(-2).join('.');
+              origins.add(`https://${mainDomain}`);
+              origins.add(`http://${mainDomain}`);
+
+              // Pour les cas comme co.uk, com.br, etc.
+              if (domainParts.length > 3 &&
+                ['co', 'com', 'org', 'net', 'gov', 'edu'].includes(domainParts[domainParts.length - 2])) {
+                const extendedDomain = domainParts.slice(-3).join('.');
+                origins.add(`https://${extendedDomain}`);
+                origins.add(`http://${extendedDomain}`);
+              }
+            }
+          }
+        } catch (e) {
+          console.error('URL invalide dans les favoris:', node.url, e);
+          invalidUrls.push(node.url);
+        }
+      }
+
+      // Traitement récursif des enfants
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(processNode);
+      }
+    };
+
+    // Traiter tous les nœuds racine
+    nodes.forEach(processNode);
+
+    return {
+      origins: Array.from(origins),
+      invalidUrls
+    };
   }
+};
 
-  nodes.forEach(processNode);
-  return { origins: Array.from(origins), invalidUrls };
-}
+// Gestionnaire de l'interface utilisateur
+const UIManager = {
+  elements: {
+    cleanButton: null,
+    statusMessage: null,
+    results: null,
+    showLogsToggle: null,
+    settingsPanel: null,
+    advancedSettingsToggle: null,
+    dataTypeCheckboxes: {},
+  },
 
-document.addEventListener('DOMContentLoaded', () => {
-  const cleanButton = document.getElementById('cleanButton');
-  const statusMessageDiv = document.getElementById('statusMessage');
-  const resultsDiv = document.getElementById('results');
-  const showLogsToggle = document.getElementById('showLogsToggle');
+  /**
+   * Initialise les éléments de l'interface utilisateur
+   */
+  initElements() {
+    this.elements.cleanButton = document.getElementById('cleanButton');
+    this.elements.statusMessage = document.getElementById('statusMessage');
+    this.elements.results = document.getElementById('results');
+    this.elements.showLogsToggle = document.getElementById('showLogsToggle');
+    this.elements.settingsPanel = document.getElementById('settingsPanel');
+    this.elements.advancedSettingsToggle = document.getElementById('advancedSettingsToggle');
 
-  // Load the saved state of the toggle
-  chrome.storage.sync.get(['showLogsEnabled'], (result) => {
-    showLogsToggle.checked = result.showLogsEnabled !== false; // Default to true if not set
-  });
+    // Options de données à nettoyer
+    const dataTypes = ['cookies', 'cache', 'indexedDB', 'localStorage', 'serviceWorkers'];
+    dataTypes.forEach(type => {
+      this.elements.dataTypeCheckboxes[type] = document.getElementById(`${type}Checkbox`);
+    });
+  },
 
-  // Save the state of the toggle when it changes
-  showLogsToggle.addEventListener('change', () => {
-    chrome.storage.sync.set({ showLogsEnabled: showLogsToggle.checked });
-  });
+  /**
+   * Initialise l'état des éléments de l'UI depuis le stockage
+   */
+  async loadSavedState() {
+    try {
+      const result = await chrome.storage.sync.get({
+        showLogsEnabled: true,
+        advancedSettingsVisible: false,
+        dataTypes: {
+          cookies: true,
+          cache: true,
+          indexedDB: true,
+          localStorage: true,
+          serviceWorkers: true
+        }
+      });
 
-  cleanButton.addEventListener('click', async () => {
-    // Clear previous results and status
-    resultsDiv.innerHTML = '';
-    statusMessageDiv.textContent = 'Nettoyage en cours...';
-    cleanButton.disabled = true;
+      this.elements.showLogsToggle.checked = result.showLogsEnabled;
+
+      // Paramètres avancés
+      this.toggleAdvancedSettings(result.advancedSettingsVisible);
+      if (this.elements.advancedSettingsToggle) {
+        this.elements.advancedSettingsToggle.checked = result.advancedSettingsVisible;
+      }
+
+      // Cases à cocher pour les types de données
+      Object.entries(result.dataTypes).forEach(([type, checked]) => {
+        if (this.elements.dataTypeCheckboxes[type]) {
+          this.elements.dataTypeCheckboxes[type].checked = checked;
+        }
+      });
+    } catch (error) {
+      console.error("Erreur lors du chargement des paramètres:", error);
+    }
+  },
+
+  /**
+   * Affiche ou masque les paramètres avancés
+   * @param {boolean} visible 
+   */
+  toggleAdvancedSettings(visible) {
+    if (this.elements.settingsPanel) {
+      this.elements.settingsPanel.style.display = visible ? 'block' : 'none';
+    }
+
+    chrome.storage.sync.set({ advancedSettingsVisible: visible });
+  },
+
+  /**
+   * Affiche un message de statut
+   * @param {string} message 
+   * @param {string} type - 'info', 'success', 'error', 'warning'
+   */
+  setStatus(message, type = 'info') {
+    if (!this.elements.statusMessage) return;
+
+    this.elements.statusMessage.textContent = message;
+
+    // Réinitialiser les classes
+    this.elements.statusMessage.className = '';
+
+    // Ajouter la classe en fonction du type
+    if (type) {
+      this.elements.statusMessage.classList.add(`status-${type}`);
+    }
+  },
+
+  /**
+   * Ajoute un résultat à la section des résultats
+   * @param {string} message 
+   * @param {string} type - 'info', 'success', 'error', 'warning'
+   */
+  addResult(message, type = 'info') {
+    if (!this.elements.results) return;
+
+    const p = document.createElement('p');
+    p.textContent = message;
+    p.classList.add(`result-${type}`);
+
+    this.elements.results.appendChild(p);
+  },
+
+  /**
+   * Ajoute une liste à la section des résultats
+   * @param {Array} items 
+   * @param {string} type - 'info', 'warning', 'error'
+   */
+  addResultList(items, type = 'info') {
+    if (!items || items.length === 0 || !this.elements.results) return;
+
+    const ul = document.createElement('ul');
+    ul.classList.add(`list-${type}`);
+
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      ul.appendChild(li);
+    });
+
+    this.elements.results.appendChild(ul);
+  },
+
+  /**
+   * Efface tous les résultats affichés
+   */
+  clearResults() {
+    if (this.elements.results) {
+      this.elements.results.innerHTML = '';
+    }
+    this.setStatus('');
+  },
+
+  /**
+   * Active/désactive le bouton de nettoyage
+   * @param {boolean} enabled 
+   */
+  setCleanButtonEnabled(enabled) {
+    if (this.elements.cleanButton) {
+      this.elements.cleanButton.disabled = !enabled;
+    }
+  },
+
+  /**
+   * Récupère les types de données sélectionnés pour le nettoyage
+   * @returns {Object} Objet avec les types de données comme clés et des booléens comme valeurs
+   */
+  getSelectedDataTypes() {
+    const dataTypes = {};
+
+    Object.entries(this.elements.dataTypeCheckboxes).forEach(([type, checkbox]) => {
+      if (checkbox) {
+        dataTypes[type] = checkbox.checked;
+      }
+    });
+
+    return dataTypes;
+  },
+
+  /**
+   * Sauvegarde les paramètres actuels
+   */
+  saveSettings() {
+    const dataTypes = this.getSelectedDataTypes();
+
+    chrome.storage.sync.set({
+      showLogsEnabled: this.elements.showLogsToggle?.checked || false,
+      dataTypes
+    });
+  }
+};
+
+// Gestionnaire de nettoyage
+const CleaningManager = {
+  /**
+   * Exécute le processus de nettoyage
+   */
+  async executeCleanup() {
+    UIManager.clearResults();
+    UIManager.setStatus('Nettoyage en cours...', 'info');
+    UIManager.setCleanButtonEnabled(false);
 
     try {
-      const { origins, invalidUrls } = await getBookmarkOrigins();
+      // Récupérer les origines des favoris
+      const { origins, invalidUrls } = await BookmarkManager.getBookmarkOrigins();
 
+      // Afficher les URL invalides si nécessaire
       if (invalidUrls.length > 0) {
-        resultsDiv.innerHTML += `<p style="color: orange;">Attention: ${invalidUrls.length} URL(s) invalide(s) trouvée(s) dans les favoris:</p>`;
-        const ul = document.createElement('ul');
-        invalidUrls.forEach(url => {
-          const li = document.createElement('li');
-          li.textContent = url;
-          ul.appendChild(li);
-        });
-        resultsDiv.appendChild(ul);
+        UIManager.addResult(
+          `Attention: ${invalidUrls.length} URL(s) invalide(s) trouvée(s) dans les favoris:`,
+          'warning'
+        );
+        UIManager.addResultList(invalidUrls, 'warning');
       }
 
-      // Établir une connexion persistante
+      // Établir la connexion avec le background script
       const port = chrome.runtime.connect({ name: "clean-port" });
-      port.postMessage({ action: "clean", origins });
+
+      // Récupérer les types de données sélectionnés
+      const dataTypes = UIManager.getSelectedDataTypes();
+
+      // Envoyer la demande de nettoyage
+      port.postMessage({
+        action: "clean",
+        origins,
+        dataTypes
+      });
 
       // Gérer la réponse
       port.onMessage.addListener((msg) => {
-        cleanButton.disabled = false;
-        statusMessageDiv.textContent = ''; // Clear status message
+        UIManager.setCleanButtonEnabled(true);
+        UIManager.setStatus('');
 
         if (msg.status === "done") {
-          resultsDiv.innerHTML += '<p style="color: green;">Nettoyage terminé avec succès!</p>';
-          if (showLogsToggle.checked && msg.log) {
-            chrome.tabs.create({ url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log)) });
+          const domainsCount = origins.length;
+          UIManager.addResult(
+            `Nettoyage terminé avec succès! ${domainsCount} domaine(s) préservé(s).`,
+            'success'
+          );
+
+          // Afficher les logs si l'option est activée
+          if (UIManager.elements.showLogsToggle?.checked && msg.log) {
+            chrome.tabs.create({
+              url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log))
+            });
           }
         } else if (msg.status === "error") {
-          resultsDiv.innerHTML += `<p style="color: red;">Erreur lors du nettoyage: ${msg.message}</p>`;
-          if (showLogsToggle.checked && msg.log) {
-             chrome.tabs.create({ url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log)) });
+          UIManager.addResult(`Erreur lors du nettoyage: ${msg.message}`, 'error');
+
+          // Afficher les logs en cas d'erreur si l'option est activée
+          if (UIManager.elements.showLogsToggle?.checked && msg.log) {
+            chrome.tabs.create({
+              url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log))
+            });
           }
         }
       });
 
+      // Gérer la déconnexion
       port.onDisconnect.addListener(() => {
-          cleanButton.disabled = false;
-          statusMessageDiv.textContent = ''; // Clear status message
-          resultsDiv.innerHTML += '<p style="color: red;">La connexion avec le service de nettoyage a été interrompue.</p>';
+        UIManager.setCleanButtonEnabled(true);
+        UIManager.setStatus('');
+
+        if (chrome.runtime.lastError) {
+          UIManager.addResult(
+            `La connexion avec le service de nettoyage a été interrompue: ${chrome.runtime.lastError.message}`,
+            'error'
+          );
+        } else {
+          UIManager.addResult(
+            'La connexion avec le service de nettoyage a été interrompue.',
+            'error'
+          );
+        }
       });
 
     } catch (error) {
-      console.error("Error getting bookmark origins:", error);
-      cleanButton.disabled = false;
-      statusMessageDiv.textContent = '';
-      resultsDiv.innerHTML += `<p style="color: red;">Erreur lors de la récupération des favoris: ${error.message}</p>`;
+      console.error("Erreur pendant le processus de nettoyage:", error);
+      UIManager.setCleanButtonEnabled(true);
+      UIManager.setStatus('');
+      UIManager.addResult(`Erreur: ${error.message}`, 'error');
     }
+  }
+};
+
+/**
+ * Initialise l'application lorsque le DOM est chargé
+ */
+document.addEventListener('DOMContentLoaded', async () => {
+  // Initialiser l'interface utilisateur
+  UIManager.initElements();
+  await UIManager.loadSavedState();
+
+  // Écouter les événements de l'interface
+  UIManager.elements.cleanButton?.addEventListener('click', () => {
+    CleaningManager.executeCleanup();
+  });
+
+  UIManager.elements.showLogsToggle?.addEventListener('change', () => {
+    UIManager.saveSettings();
+  });
+
+  UIManager.elements.advancedSettingsToggle?.addEventListener('change', (e) => {
+    UIManager.toggleAdvancedSettings(e.target.checked);
+  });
+
+  // Écouter les changements dans les cases à cocher des types de données
+  Object.values(UIManager.elements.dataTypeCheckboxes).forEach(checkbox => {
+    checkbox?.addEventListener('change', () => {
+      UIManager.saveSettings();
+    });
   });
 });
-
-async function getBookmarkOrigins() {
-  const nodes = await chrome.bookmarks.getTree();
-  return extractOrigins(nodes);
-}
-
-function extractOrigins(nodes) {
-  const origins = new Set();
-  const invalidUrls = [];
-
-  function processNode(node) {
-    if (node.url) {
-      try {
-        const url = new URL(node.url);
-        origins.add(url.origin);
-        // Ajoute le domaine parent pour les sous-domaines
-        const domainParts = url.hostname.split('.');
-        if (domainParts.length > 2) {
-          origins.add(`https://${domainParts.slice(-2).join('.')}`);
-          origins.add(`http://${domainParts.slice(-2).join('.')}`);
-        }
-      } catch (e) {
-        console.error('URL invalide:', node.url, e);
-        invalidUrls.push(node.url);
-      }
-    }
-    node.children?.forEach(processNode);
-  }
-
-  nodes.forEach(processNode);
-  return { origins: Array.from(origins), invalidUrls };
-}

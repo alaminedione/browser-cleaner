@@ -1,14 +1,110 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clean Browser Data - Operation Logs</title>
-    <link href="style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h1>Operation Logs</h1>
-    <div id="logContent"></div>
-    <script src="logs.js"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logs de Nettoyage</title>
+  <link rel="stylesheet" href="logs.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>
+        <img src="icon.png" alt="Logo" class="logo" height="22">
+        Logs de Nettoyage
+      </h1>
+      <div class="actions">
+        <button id="exportBtn" class="btn btn-secondary">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M19,9h-4V3H9v6H5l7,7L19,9z M5,18v2h14v-2H5z"></path>
+          </svg>
+          Exporter
+        </button>
+        <button id="goBackBtn" class="btn btn-primary">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M20,11H7.83l5.59-5.59L12,4l-8,8l8,8l1.41-1.41L7.83,13H20V11z"></path>
+          </svg>
+          Retour
+        </button>
+      </div>
+    </header>
+
+    <div class="log-summary">
+      <div class="summary-item">
+        <div class="summary-label">Statut</div>
+        <div id="statusValue" class="summary-value">-</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Date</div>
+        <div id="dateValue" class="summary-value">-</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Durée</div>
+        <div id="durationValue" class="summary-value">-</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Sites préservés</div>
+        <div id="preservedValue" class="summary-value">-</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="details">Détails</button>
+      <button class="tab-btn" data-tab="domains">Domaines préservés</button>
+      <button class="tab-btn" data-tab="raw">JSON brut</button>
+    </div>
+
+    <div class="tab-content active" id="details">
+      <div class="log-section">
+        <h2>Informations sur l'opération</h2>
+        <table class="log-table">
+          <tbody id="detailsTable">
+            <tr>
+              <td>Chargement...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="log-section" id="errorSection" style="display: none;">
+        <h2>Erreur</h2>
+        <div class="error-container">
+          <div id="errorMessage" class="error-message"></div>
+          <div class="code-block">
+            <pre id="errorStack"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="domains">
+      <div class="search-container">
+        <input type="text" id="domainSearch" placeholder="Rechercher un domaine..." class="search-input">
+      </div>
+      <div class="domains-list" id="domainsList">
+        <p>Chargement des domaines...</p>
+      </div>
+    </div>
+
+    <div class="tab-content" id="raw">
+      <div class="code-actions">
+        <button id="copyJsonBtn" class="btn btn-sm">Copier</button>
+        <button id="formatJsonBtn" class="btn btn-sm">Formater</button>
+      </div>
+      <div class="code-block">
+        <pre id="rawJson">Chargement...</pre>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-text">Browser Cleaner</div>
+      <div class="footer-version">v1.0</div>
+    </footer>
+  </div>
+
+  <script src="logs.js"></script>
+</body>
+
 </html>
