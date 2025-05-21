@@ -95,6 +95,8 @@ const UIManager = {
     settingsPanel: null,
     advancedSettingsToggle: null,
     dataTypeCheckboxes: {},
+    bookmarksCount: null,
+    lastCleanedTime: null,
   },
 
   /**
@@ -107,6 +109,8 @@ const UIManager = {
     this.elements.showLogsToggle = document.getElementById('showLogsToggle');
     this.elements.settingsPanel = document.getElementById('settingsPanel');
     this.elements.advancedSettingsToggle = document.getElementById('advancedSettingsToggle');
+    this.elements.bookmarksCount = document.getElementById('bookmarksCount');
+    this.elements.lastCleanedTime = document.getElementById('lastCleanedTime');
 
     // Options de données à nettoyer
     const dataTypes = ['cookies', 'cache', 'indexedDB', 'localStorage', 'serviceWorkers'];
@@ -153,14 +157,65 @@ const UIManager = {
 
   /**
    * Affiche ou masque les paramètres avancés
-   * @param {boolean} visible 
+   * @param {boolean} visible
    */
   toggleAdvancedSettings(visible) {
     if (this.elements.settingsPanel) {
       this.elements.settingsPanel.style.display = visible ? 'block' : 'none';
     }
 
-    chrome.storage.sync.set({ advancedSettingsVisible: visible });
+    chrome.storage.sync.set({
+      advancedSettingsVisible: visible
+    });
+  },
+
+  /**
+   * Met à jour l'affichage des statistiques
+   * @param {number} bookmarksCount - Nombre de sites favoris
+   * @param {string|null} lastCleanedTime - Date/heure du dernier nettoyage (format ISO string)
+   */
+  updateStats(bookmarksCount, lastCleanedTime) {
+    if (this.elements.bookmarksCount) {
+      this.elements.bookmarksCount.innerText = bookmarksCount >= 0 ? bookmarksCount : '-';
+    }
+    if (this.elements.lastCleanedTime) {
+      if (lastCleanedTime) {
+        try {
+          const date = new Date(lastCleanedTime);
+          // Format: JJ/MM/AAAA HH:MM
+          const formattedDate = date.toLocaleDateString('fr-FR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          });
+          const formattedTime = date.toLocaleTimeString('fr-FR', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          this.elements.lastCleanedTime.innerText = `${formattedDate} ${formattedTime}`;
+        } catch (e) {
+          console.error("Erreur de formatage de la date:", lastCleanedTime, e);
+          this.elements.lastCleanedTime.innerText = 'Date invalide';
+        }
+      } else {
+        this.elements.lastCleanedTime.innerText = '-';
+      }
+    }
+  },
+
+  /**
+   * Affiche un message de statut
+   * @param {string} message
+   * @param {string} type - 'info', 'success', 'error', 'warning'
+   */
+  setStatus(message, type = 'info') {
+    if (!this.elements.statusMessage) return;
+    if (this.elements.settingsPanel) {
+    }
+
+    chrome.storage.sync.set({
+      advancedSettingsVisible: visible
+    });
   },
 
   /**
@@ -271,6 +326,9 @@ const CleaningManager = {
   /**
    * Exécute le processus de nettoyage
    */
+  /**
+   * Exécute le processus de nettoyage
+   */
   async executeCleanup() {
     UIManager.clearResults();
     UIManager.setStatus('Nettoyage en cours...', 'info');
@@ -278,7 +336,10 @@ const CleaningManager = {
 
     try {
       // Récupérer les origines des favoris
-      const { origins, invalidUrls } = await BookmarkManager.getBookmarkOrigins();
+      const {
+        origins,
+        invalidUrls
+      } = await BookmarkManager.getBookmarkOrigins();
 
       // Afficher les URL invalides si nécessaire
       if (invalidUrls.length > 0) {
@@ -320,6 +381,11 @@ const CleaningManager = {
               url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log))
             });
           }
+
+          // Mettre à jour les statistiques
+          UIManager.updateStats(msg.log.excludedOrigins.count, msg.log.endTime);
+          UIManager.saveLastCleanedTime(msg.log.endTime);
+
         } else if (msg.status === "error") {
           UIManager.addResult(`Erreur lors du nettoyage: ${msg.message}`, 'error');
 
@@ -367,6 +433,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   UIManager.initElements();
   await UIManager.loadSavedState();
 
+  // Charger et afficher les statistiques
+  loadAndDisplayStats();
+
   // Écouter les événements de l'interface
   UIManager.elements.cleanButton?.addEventListener('click', () => {
     CleaningManager.executeCleanup();
@@ -387,3 +456,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 });
+
+/**
+ * Charge les statistiques sauvegardées et les affiche
+ */
+async function loadAndDisplayStats() {
+  try {
+    // Charger la dernière heure de nettoyage depuis le stockage
+    const storageResult = await chrome.storage.sync.get({
+      lastCleanedTime: null
+    });
+    const lastCleanedTime = storageResult.lastCleanedTime;
+
+    // Récupérer le nombre actuel de sites favoris
+    const {
+      origins
+    } = await BookmarkManager.getBookmarkOrigins();
+    const bookmarksCount = origins.length;
+
+    // Mettre à jour l'affichage des statistiques
+    UIManager.updateStats(bookmarksCount, lastCleanedTime);
+
+  } catch (error) {
+    console.error("Erreur lors du chargement ou de l'affichage des statistiques:", error);
+    UIManager.updateStats(-1, null); // Afficher des tirets en cas d'erreur
+    // Potentiellement afficher une erreur dans les logs si nécessaire
+  }
+}
