@@ -99,6 +99,10 @@
     "message": "Invalid Date",
     "description": "Text shown when the last cleaned date cannot be formatted."
   },
+  "invalidDateFormat": {
+    "message": "Invalid Date Format",
+    "description": "Text shown when the date format is invalid."
+  },
   "errorLoadingSettings": {
     "message": "Error loading settings:",
     "description": "Console error message when loading settings fails."
@@ -110,5 +114,25 @@
   "errorLoadingOrDisplayingStats": {
     "message": "Error loading or displaying statistics:",
     "description": "Console error message when loading/displaying stats fails."
+  },
+  "notification_error_fallback": {
+    "message": "An error occurred while displaying the notification",
+    "description": "Error message when notification display fails"
+  },
+  "notification_image_error": {
+    "message": "Error loading image for notification",
+    "description": "Error message for notification image loading issues"
+  },
+  "notification_retry": {
+    "message": "Attempting with default parameters...",
+    "description": "Message when retrying after an error"
+  },
+  "confirmReset": {
+    "message": "Are you sure you want to reset all settings?",
+    "description": "Confirmation message when resetting settings"
+  },
+  "statusResetSuccess": {
+    "message": "Settings successfully reset",
+    "description": "Success message after settings reset"
   }
 }

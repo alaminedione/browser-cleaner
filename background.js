@@ -3,7 +3,8 @@ const CONFIG = {
   notificationIcons: {
     success: 'icon-success.png',
     error: 'icon-error.png',
-    progress: 'icon-progress.png'
+    progress: 'icon-progress.png',
+    default: 'icon.png'
   },
   defaultDataTypes: {
     cookies: true,
@@ -42,29 +43,59 @@ const Utils = {
   },
 
 
-  showNotification: (type, title, message) => {
-    chrome.notifications.create({
-      type: 'basic',
-      iconUrl: CONFIG.notificationIcons[type] || 'icon.png',
-      title: title,
-      message: message
-    });
+  showNotification: async (type, title, message) => {
+    try {
+      // Vérifier si l'icône existe et utiliser l'icône par défaut si nécessaire
+      let iconUrl = 'icon.png';
+      if (type && CONFIG.notificationIcons[type]) {
+        iconUrl = CONFIG.notificationIcons[type];
+      }
+      
+      await chrome.notifications.create({
+        type: 'basic',
+        iconUrl: iconUrl,
+        title: title || '',
+        message: message || ''
+      });
+      Utils.logger.debug(`Notification created: ${type}`, { title, message });
+    } catch (error) {
+      // Si l'affichage de notification échoue, on log l'erreur mais on continue
+      Utils.logger.error('Failed to show notification', error);
+      console.error('Notification error:', error);
+      // Réessayer avec uniquement l'icône par défaut en cas d'échec
+      try {
+        await chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'icon.png',
+          title: title || '',
+          message: message || ''
+        });
+      } catch (fallbackError) {
+        // Si même la notification de secours échoue, on continue silencieusement
+        Utils.logger.error('Failed to show fallback notification', fallbackError);
+      }
+    }
   }
 };
 
 // Service de nettoyage des données
 const CleaningService = {
   // Affiche une notification de progression
-  showProgressNotification() {
-    Utils.showNotification(
-      'progress',
-      chrome.i18n.getMessage('notification_cleaning_started'),
-      ''
-    );
+  async showProgressNotification() {
+    try {
+      await Utils.showNotification(
+        'progress',
+        chrome.i18n.getMessage('notification_cleaning_started'),
+        ''
+      );
+    } catch (error) {
+      Utils.logger.warn('Failed to show progress notification', error);
+      // Continue le processus même si la notification échoue
+    }
   },
 
   // Traite les résultats du nettoyage
-  handleCleaningResult(port, startTime, excludedOrigins, dataTypes, error = null) {
+  async handleCleaningResult(port, startTime, excludedOrigins, dataTypes, error = null) {
     const endTime = new Date().toISOString();
     const logDetails = {
       operation: 'browsing-data-cleanup',
@@ -86,18 +117,26 @@ const CleaningService = {
     Utils.logger.info('Cleaning operation completed', logDetails);
 
     if (error) {
-      Utils.showNotification(
-        'error',
-        chrome.i18n.getMessage('notification_cleaning_failed_title'),
-        chrome.i18n.getMessage('notification_cleaning_failed_detail', [error.message])
-      );
+      try {
+        await Utils.showNotification(
+          'error',
+          chrome.i18n.getMessage('notification_cleaning_failed_title'),
+          chrome.i18n.getMessage('notification_cleaning_failed_detail', [error.message])
+        );
+      } catch (notifError) {
+        Utils.logger.error('Failed to show error notification', notifError);
+      }
       port.postMessage({ status: "error", message: error.message, log: logDetails });
     } else {
-      Utils.showNotification(
-        'success',
-        chrome.i18n.getMessage('notification_cleaning_success_title'),
-        chrome.i18n.getMessage('notification_cleaning_success_detail', [excludedOrigins.length])
-      );
+      try {
+        await Utils.showNotification(
+          'success',
+          chrome.i18n.getMessage('notification_cleaning_success_title'),
+          chrome.i18n.getMessage('notification_cleaning_success_detail', [excludedOrigins.length])
+        );
+      } catch (notifError) {
+        Utils.logger.error('Failed to show success notification', notifError);
+      }
       port.postMessage({ status: "done", log: logDetails });
     }
   },
@@ -109,7 +148,7 @@ const CleaningService = {
 
     try {
       // Afficher une notification de progression
-      this.showProgressNotification();
+      await this.showProgressNotification();
 
       Utils.logger.info('Starting browsing data cleanup', {
         excludedOrigins: origins.length,

@@ -2,6 +2,9 @@
   "extName": {
     "message": "Nettoyage de Navigation"
   },
+  "popupTitle": {
+    "message": "Nettoyage de Navigation"
+  },
   "cleanButtonText": {
     "message": "Nettoyer maintenant"
   },
@@ -79,6 +82,10 @@
       }
     }
   },
+  "notification_error_fallback": {
+    "message": "Une erreur s'est produite lors de l'affichage de la notification",
+    "description": "Message d'erreur quand l'affichage d'une notification échoue"
+  },
   "statusConnectionInterrupted": {
     "message": "La connexion avec le service de nettoyage a été interrompue."
   },
@@ -118,6 +125,10 @@
       }
     }
   },
+  "notification_image_error": {
+    "message": "Erreur de chargement d'image pour la notification",
+    "description": "Message d'erreur pour les problèmes de chargement d'images de notification"
+  },
   "errorLoadingSettings": {
     "message": "Erreur lors du chargement des paramètres :",
     "description": "Console error message when loading settings fails."
@@ -129,5 +140,20 @@
   "errorLoadingOrDisplayingStats": {
     "message": "Erreur lors du chargement ou de l'affichage des statistiques :",
     "description": "Console error message when loading/displaying stats fails."
+  },
+  "notification_retry": {
+    "message": "Tentative avec paramètres par défaut...",
+    "description": "Message lors d'une tentative de repli après erreur"
+  },
+  "invalidDateFormat": {
+    "message": "Format de date invalide"
+  },
+  "confirmReset": {
+    "message": "Êtes-vous sûr de vouloir réinitialiser tous les paramètres ?",
+    "description": "Message de confirmation lors de la réinitialisation des paramètres"
+  },
+  "statusResetSuccess": {
+    "message": "Paramètres réinitialisés avec succès",
+    "description": "Message de succès après réinitialisation des paramètres"
   }
 }

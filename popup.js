@@ -111,11 +111,24 @@ const UIManager = {
     this.elements.advancedSettingsToggle = document.getElementById('advancedSettingsToggle');
     this.elements.bookmarksCount = document.getElementById('bookmarksCount');
     this.elements.lastCleanedTime = document.getElementById('lastCleanedTime');
+    this.elements.resetButton = document.getElementById('resetButton');
+    
+    // Vérifier si des éléments essentiels sont manquants
+    const essentialElements = ['cleanButton', 'statusMessage', 'results'];
+    for (const elemId of essentialElements) {
+      if (!this.elements[elemId]) {
+        console.error(`Élément essentiel non trouvé: ${elemId}`);
+      }
+    }
 
     // Options de données à nettoyer
     const dataTypes = ['cookies', 'cache', 'indexedDB', 'localStorage', 'serviceWorkers'];
     dataTypes.forEach(type => {
-      this.elements.dataTypeCheckboxes[type] = document.getElementById(`${type}Checkbox`);
+      const checkbox = document.getElementById(`${type}Checkbox`);
+      this.elements.dataTypeCheckboxes[type] = checkbox;
+      if (!checkbox) {
+        console.warn(`Case à cocher non trouvée pour le type de données: ${type}`);
+      }
     });
   },
 
@@ -136,7 +149,10 @@ const UIManager = {
         }
       });
 
-      this.elements.showLogsToggle.checked = result.showLogsEnabled;
+      // Appliquer les paramètres seulement si les éléments existent
+      if (this.elements.showLogsToggle) {
+        this.elements.showLogsToggle.checked = result.showLogsEnabled;
+      }
 
       // Paramètres avancés
       this.toggleAdvancedSettings(result.advancedSettingsVisible);
@@ -148,10 +164,16 @@ const UIManager = {
       Object.entries(result.dataTypes).forEach(([type, checked]) => {
         if (this.elements.dataTypeCheckboxes[type]) {
           this.elements.dataTypeCheckboxes[type].checked = checked;
+        } else {
+          console.warn(`Case à cocher non disponible pour le type: ${type}`);
         }
       });
+      
+      return result;
     } catch (error) {
-      console.error(chrome.i18n.getMessage('errorLoadingSettings'), error); // Assuming 'errorLoadingSettings' key will be added
+      console.error(chrome.i18n.getMessage('errorLoadingSettings'), error);
+      this.setStatus(chrome.i18n.getMessage('errorLoadingSettings'), 'error');
+      return null;
     }
   },
 
@@ -162,21 +184,38 @@ const UIManager = {
   toggleAdvancedSettings(visible) {
     if (this.elements.settingsPanel) {
       this.elements.settingsPanel.style.display = visible ? 'block' : 'none';
+    } else {
+      console.warn('Panneau de paramètres non disponible pour le basculement de visibilité');
+      return;
     }
 
-    chrome.storage.sync.set({
-      advancedSettingsVisible: visible
-    });
+    try {
+      chrome.storage.sync.set({
+        advancedSettingsVisible: visible
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'enregistrement de l\'état des paramètres avancés:', error);
+    }
   },
 
   /**
    * Sauvegarde la dernière heure de nettoyage dans le stockage
    * @param {string} timeString - Date/heure du dernier nettoyage (format ISO string)
+   * @returns {Promise<void>}
    */
-  saveLastCleanedTime(timeString) {
-    chrome.storage.sync.set({
-      lastCleanedTime: timeString
-    });
+  async saveLastCleanedTime(timeString) {
+    if (!timeString) {
+      console.warn('Tentative de sauvegarde d\'un horodatage invalide');
+      return;
+    }
+    
+    try {
+      await chrome.storage.sync.set({
+        lastCleanedTime: timeString
+      });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de l\'heure de nettoyage:', error);
+    }
   },
 
   /**
@@ -185,27 +224,39 @@ const UIManager = {
    * @param {string|null} lastCleanedTime - Date/heure du dernier nettoyage (format ISO string)
    */
   updateStats(bookmarksCount, lastCleanedTime) {
+    // Mise à jour du nombre de favoris
     if (this.elements.bookmarksCount) {
-      this.elements.bookmarksCount.innerText = bookmarksCount >= 0 ? bookmarksCount : '-';
+      this.elements.bookmarksCount.innerText = bookmarksCount >= 0 ? bookmarksCount.toString() : '-';
     }
+    
+    // Mise à jour de la date du dernier nettoyage
     if (this.elements.lastCleanedTime) {
       if (lastCleanedTime) {
         try {
           const date = new Date(lastCleanedTime);
+          
+          // Vérifier si la date est valide
+          if (isNaN(date.getTime())) {
+            throw new Error('Date invalide');
+          }
+          
+          // Utiliser la locale du navigateur ou par défaut fr-FR
+          const locale = navigator.language || 'fr-FR';
+          
           // Format: JJ/MM/AAAA HH:MM
-          const formattedDate = date.toLocaleDateString('fr-FR', {
+          const formattedDate = date.toLocaleDateString(locale, {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
           });
-          const formattedTime = date.toLocaleTimeString('fr-FR', {
+          const formattedTime = date.toLocaleTimeString(locale, {
             hour: '2-digit',
             minute: '2-digit'
           });
           this.elements.lastCleanedTime.innerText = `${formattedDate} ${formattedTime}`;
         } catch (e) {
-          console.error(chrome.i18n.getMessage('errorFormattingDate'), lastCleanedTime, e); // Assuming you'll add this key
-          this.elements.lastCleanedTime.innerText = chrome.i18n.getMessage('invalidDateFormat');
+          console.error('Erreur de formatage de date:', lastCleanedTime, e);
+          this.elements.lastCleanedTime.innerText = chrome.i18n.getMessage('invalidDateFormat') || 'Date invalide';
         }
       } else {
         this.elements.lastCleanedTime.innerText = '-';
@@ -219,18 +270,24 @@ const UIManager = {
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
   setStatus(message, type = 'info') {
-    if (!this.elements.statusMessage) return;
+    if (!this.elements.statusMessage) {
+      console.warn('Élément de message de statut non disponible');
+      return;
+    }
 
-    this.elements.statusMessage.textContent = message;
+    // Convertir les messages potentiellement undefined en chaîne vide
+    const safeMessage = message || '';
+    this.elements.statusMessage.textContent = safeMessage;
 
     // Réinitialiser les classes
-    this.elements.statusMessage.className = '';
+    this.elements.statusMessage.className = 'status';
 
     // Ajouter la classe en fonction du type
-    if (type) {
+    const validTypes = ['info', 'success', 'error', 'warning'];
+    if (type && validTypes.includes(type)) {
       this.elements.statusMessage.classList.add(`status-${type}`);
-      }
-    },
+    }
+  },
 
   /**
    * Ajoute un résultat à la section des résultats
@@ -292,27 +349,49 @@ const UIManager = {
    * @returns {Object} Objet avec les types de données comme clés et des booléens comme valeurs
    */
   getSelectedDataTypes() {
-    const dataTypes = {};
+    const dataTypes = {
+      cookies: true,
+      cache: true,
+      indexedDB: true,
+      localStorage: true,
+      serviceWorkers: true
+    };
 
-    Object.entries(this.elements.dataTypeCheckboxes).forEach(([type, checkbox]) => {
-      if (checkbox) {
-        dataTypes[type] = checkbox.checked;
-      }
-    });
+    try {
+      // Mettre à jour les valeurs en fonction des cases cochées si elles existent
+      Object.entries(this.elements.dataTypeCheckboxes).forEach(([type, checkbox]) => {
+        if (checkbox) {
+          dataTypes[type] = checkbox.checked;
+        }
+      });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des types de données:', error);
+      // Retourne les valeurs par défaut en cas d'erreur
+    }
 
     return dataTypes;
   },
 
   /**
    * Sauvegarde les paramètres actuels
+   * @returns {Promise<boolean>} True si la sauvegarde a réussi, false sinon
    */
-  saveSettings() {
-    const dataTypes = this.getSelectedDataTypes();
+  async saveSettings() {
+    try {
+      const dataTypes = this.getSelectedDataTypes();
+      const showLogsEnabled = this.elements.showLogsToggle?.checked || false;
 
-    chrome.storage.sync.set({
-      showLogsEnabled: this.elements.showLogsToggle?.checked || false,
-      dataTypes
-    });
+      await chrome.storage.sync.set({
+        showLogsEnabled,
+        dataTypes
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde des paramètres:', error);
+      this.setStatus(chrome.i18n.getMessage('errorLoadingSettings'), 'error');
+      return false;
+    }
   }
 };
 
@@ -424,36 +503,81 @@ const CleaningManager = {
  * Initialise l'application lorsque le DOM est chargé
  */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Initialiser l'interface utilisateur
-  UIManager.initElements();
-  await UIManager.loadSavedState();
+  try {
+    // Initialiser l'interface utilisateur
+    UIManager.initElements();
+    await UIManager.loadSavedState();
 
-  // Charger et afficher les statistiques
-  loadAndDisplayStats();
+    // Charger et afficher les statistiques
+    await loadAndDisplayStats();
 
-  // Écouter les événements de l'interface
-  UIManager.elements.cleanButton?.addEventListener('click', () => {
-    CleaningManager.executeCleanup();
-  });
+    // Écouter les événements de l'interface
+    if (UIManager.elements.cleanButton) {
+      UIManager.elements.cleanButton.addEventListener('click', () => {
+        CleaningManager.executeCleanup();
+      });
+    }
 
-  UIManager.elements.showLogsToggle?.addEventListener('change', () => {
-    UIManager.saveSettings();
-  });
+    if (UIManager.elements.showLogsToggle) {
+      UIManager.elements.showLogsToggle.addEventListener('change', async () => {
+        await UIManager.saveSettings();
+      });
+    }
 
-  UIManager.elements.advancedSettingsToggle?.addEventListener('change', (e) => {
-    UIManager.toggleAdvancedSettings(e.target.checked);
-  });
+    if (UIManager.elements.advancedSettingsToggle) {
+      UIManager.elements.advancedSettingsToggle.addEventListener('change', (e) => {
+        UIManager.toggleAdvancedSettings(e.target.checked);
+      });
+    }
 
-  // Écouter les changements dans les cases à cocher des types de données
-  Object.values(UIManager.elements.dataTypeCheckboxes).forEach(checkbox => {
-    checkbox?.addEventListener('change', () => {
-      UIManager.saveSettings();
+    // Écouter les changements dans les cases à cocher des types de données
+    Object.values(UIManager.elements.dataTypeCheckboxes).forEach(checkbox => {
+      if (checkbox) {
+        checkbox.addEventListener('change', async () => {
+          await UIManager.saveSettings();
+        });
+      }
     });
-  });
+
+    // Ajouter l'événement pour le bouton de réinitialisation
+    if (UIManager.elements.resetButton) {
+      UIManager.elements.resetButton.addEventListener('click', async () => {
+        if (confirm(chrome.i18n.getMessage('confirmReset') || 'Êtes-vous sûr de vouloir réinitialiser tous les paramètres?')) {
+          await resetAllSettings();
+        }
+      });
+    }
+    
+    console.info('Initialisation de l\'interface utilisateur terminée');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation de l\'interface:', error);
+    UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
+  }
 });
 
 /**
+ * Réinitialise tous les paramètres
+ */
+async function resetAllSettings() {
+  try {
+    await chrome.storage.sync.clear();
+    UIManager.setStatus(chrome.i18n.getMessage('statusResetSuccess') || 'Paramètres réinitialisés avec succès', 'success');
+    
+    // Recharger les paramètres par défaut
+    await UIManager.loadSavedState();
+    await loadAndDisplayStats();
+    
+    return true;
+  } catch (error) {
+    console.error('Erreur lors de la réinitialisation des paramètres:', error);
+    UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
+    return false;
+  }
+}
+
+/**
  * Charge les statistiques sauvegardées et les affiche
+ * @returns {Promise<boolean>} True si les statistiques ont été chargées avec succès
  */
 async function loadAndDisplayStats() {
   try {
@@ -463,18 +587,27 @@ async function loadAndDisplayStats() {
     });
     const lastCleanedTime = storageResult.lastCleanedTime;
 
-    // Récupérer le nombre actuel de sites favoris
-    const {
-      origins
-    } = await BookmarkManager.getBookmarkOrigins();
-    const bookmarksCount = origins.length;
+    let bookmarksCount = 0;
+    try {
+      // Récupérer le nombre actuel de sites favoris
+      const {
+        origins
+      } = await BookmarkManager.getBookmarkOrigins();
+      bookmarksCount = origins.length;
+    } catch (bookmarkError) {
+      console.error('Erreur lors de la récupération des favoris:', bookmarkError);
+      UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [bookmarkError.message]), 'warning');
+      bookmarksCount = -1;
+    }
 
     // Mettre à jour l'affichage des statistiques
     UIManager.updateStats(bookmarksCount, lastCleanedTime);
+    return true;
 
   } catch (error) {
-    console.error(chrome.i18n.getMessage('errorLoadingOrDisplayingStats'), error); // Assuming you'll add this key
+    console.error(chrome.i18n.getMessage('errorLoadingOrDisplayingStats'), error);
+    UIManager.setStatus(chrome.i18n.getMessage('errorLoadingOrDisplayingStats'), 'error');
     UIManager.updateStats(-1, null); // Afficher des tirets en cas d'erreur
-    // Potentiellement afficher une erreur dans les logs si nécessaire
+    return false;
   }
 }
