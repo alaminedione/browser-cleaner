@@ -1,0 +1,121 @@
+{
+  "extension_name": {
+    "message": "Nettoyage de Navigation"
+  },
+  "clean_now_button": {
+    "message": "Nettoyer maintenant"
+  },
+  "advanced_settings_toggle": {
+    "message": "Paramètres avancés"
+  },
+  "data_types_heading": {
+    "message": "Types de données à nettoyer :"
+  },
+  "data_type_cookies": {
+    "message": "Cookies"
+  },
+  "data_type_cache": {
+    "message": "Cache"
+  },
+  "data_type_indexeddb": {
+    "message": "IndexedDB"
+  },
+  "data_type_localstorage": {
+    "message": "LocalStorage"
+  },
+  "data_type_serviceworkers": {
+    "message": "Service Workers"
+  },
+  "show_detailed_logs_toggle": {
+    "message": "Afficher les logs détaillés"
+  },
+  "statistics_heading": {
+    "message": "Statistiques"
+  },
+  "stats_bookmarks_label": {
+    "message": "Sites favoris"
+  },
+  "stats_last_cleaned_label": {
+    "message": "Dernier nettoyage"
+  },
+  "reset_button": {
+    "message": "Réinitialiser"
+  },
+  "github_link_text": {
+    "message": "GitHub"
+  },
+  "status_cleaning_in_progress": {
+    "message": "Nettoyage en cours..."
+  },
+  "status_invalid_urls_warning": {
+    "message": "Attention : $1 URL(s) invalide(s) trouvée(s) dans les favoris :",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "status_cleaning_success": {
+    "message": "Nettoyage terminé avec succès ! $1 domaine(s) préservé(s).",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "status_cleaning_error": {
+    "message": "Erreur lors du nettoyage : $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "status_port_disconnected_error_detail": {
+    "message": "La connexion avec le service de nettoyage a été interrompue : $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "status_port_disconnected_error": {
+    "message": "La connexion avec le service de nettoyage a été interrompue."
+  },
+  "status_generic_error": {
+    "message": "Erreur : $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "invalid_date_format": {
+    "message": "Date invalide"
+  },
+  "notification_cleaning_started": {
+    "message": "Nettoyage en cours..."
+  },
+  "notification_cleaning_success_title": {
+    "message": "Nettoyage réussi"
+  },
+  "notification_cleaning_success_detail": {
+    "message": "Vos données de navigation ont été nettoyées avec succès ! ($1 sites favoris préservés)",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "notification_cleaning_failed_title": {
+    "message": "Échec du nettoyage"
+  },
+  "notification_cleaning_failed_detail": {
+    "message": "Une erreur est survenue : $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  }
+}

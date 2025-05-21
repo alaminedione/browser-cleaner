@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nettoyage de Navigation</title>
+  <title>__MSG_popupTitle__</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,7 +12,7 @@
   <div class="container">
     <h1>
       <img src="icon.png" alt="Logo" class="logo" height="18">
-      Nettoyage de Navigation
+      __MSG_popupTitle__
     </h1>
 
     <!-- Panneau principal -->
@@ -23,7 +23,7 @@
             d="M12,2C6.5,2,2,6.5,2,12s4.5,10,10,10s10-4.5,10-10S17.5,2,12,2z M16.2,16.2c-0.4,0.4-1,0.4-1.4,0 L12,13.4l-2.8,2.8c-0.4,0.4-1,0.4-1.4,0c-0.4-0.4-0.4-1,0-1.4l2.8-2.8L7.8,9.2c-0.4-0.4-0.4-1,0-1.4c0.4-0.4,1-0.4,1.4,0 l2.8,2.8l2.8-2.8c0.4-0.4,1-0.4,1.4,0c0.4,0.4,0.4,1,0,1.4L13.4,12l2.8,2.8C16.6,15.2,16.6,15.8,16.2,16.2z">
           </path>
         </svg>
-        Nettoyer maintenant
+        __MSG_cleanButtonText__
       </button>
       <div id="statusMessage" class="status"></div>
     </div>
@@ -33,33 +33,33 @@
       <div class="settings-header">
         <label class="toggle-container" for="advancedSettingsToggle">
           <input type="checkbox" id="advancedSettingsToggle">
-          <span class="toggle-label">Paramètres avancés</span>
+          <span class="toggle-label">__MSG_advancedSettingsToggleLabel__</span>
         </label>
       </div>
 
       <div id="settingsPanel" style="display: none;">
         <div class="settings-section">
-          <h3>Types de données à nettoyer:</h3>
+          <h3>__MSG_dataTypesHeader__</h3>
           <div class="checkbox-group">
             <label>
               <input type="checkbox" id="cookiesCheckbox" checked>
-              Cookies
+              __MSG_cookiesLabel__
             </label>
             <label>
               <input type="checkbox" id="cacheCheckbox" checked>
-              Cache
+              __MSG_cacheLabel__
             </label>
             <label>
               <input type="checkbox" id="indexedDBCheckbox" checked>
-              IndexedDB
+              __MSG_indexedDBLabel__
             </label>
             <label>
               <input type="checkbox" id="localStorageCheckbox" checked>
-              LocalStorage
+              __MSG_localStorageLabel__
             </label>
             <label>
               <input type="checkbox" id="serviceWorkersCheckbox" checked>
-              Service Workers
+              __MSG_serviceWorkersLabel__
             </label>
           </div>
         </div>
@@ -68,22 +68,22 @@
       <div class="settings-footer">
         <label class="toggle-container" for="showLogsToggle">
           <input type="checkbox" id="showLogsToggle" checked>
-          <span class="toggle-label">Afficher les logs détaillés</span>
+          <span class="toggle-label">__MSG_showLogsToggleLabel__</span>
         </label>
       </div>
     </div>
 
     <!-- Statistiques -->
     <div class="stats-panel">
-      <h2>Statistiques</h2>
+      <h2>__MSG_statsHeader__</h2>
       <div class="stats-grid">
         <div class="stat-item">
           <div class="stat-number" id="bookmarksCount">-</div>
-          <div class="stat-label">Sites favoris</div>
+          <div class="stat-label">__MSG_bookmarksCountLabel__</div>
         </div>
         <div class="stat-item">
           <div class="stat-number" id="lastCleanedTime">-</div>
-          <div class="stat-label">Dernier nettoyage</div>
+          <div class="stat-label">__MSG_lastCleanedTimeLabel__</div>
         </div>
       </div>
     </div>
@@ -98,7 +98,7 @@
           <path fill="currentColor" d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"></path>
           <path fill="currentColor" d="M12,20V22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20Z"></path>
         </svg>
-        Réinitialiser
+        __MSG_resetButtonText__
       </button>
       <a href="https://github.com/alaminedione/browser-cleaner" target="_blank" class="github-link">
         <svg class="icon" viewBox="0 0 24 24" width="14" height="14">
@@ -106,7 +106,7 @@
             d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z">
           </path>
         </svg>
-        GitHub
+        __MSG_githubLinkText__
       </a>
     </div>
   </div>

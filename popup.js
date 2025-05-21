@@ -15,8 +15,8 @@ const BookmarkManager = {
       const nodes = await chrome.bookmarks.getTree();
       return this.extractOrigins(nodes);
     } catch (error) {
-      console.error("Erreur lors de la récupération des favoris:", error);
-      throw new Error(`Impossible d'accéder aux favoris: ${error.message}`);
+      console.error(chrome.i18n.getMessage('errorFetchingBookmarks'), error);
+      throw new Error(chrome.i18n.getMessage('cannotAccessBookmarks', [error.message]));
     }
   },
 
@@ -64,7 +64,7 @@ const BookmarkManager = {
             }
           }
         } catch (e) {
-          console.error('URL invalide dans les favoris:', node.url, e);
+          console.error(chrome.i18n.getMessage('invalidBookmarkUrl'), node.url, e);
           invalidUrls.push(node.url);
         }
       }
@@ -168,7 +168,7 @@ const UIManager = {
       advancedSettingsVisible: visible
     });
   },
- 
+
   /**
    * Sauvegarde la dernière heure de nettoyage dans le stockage
    * @param {string} timeString - Date/heure du dernier nettoyage (format ISO string)
@@ -178,7 +178,7 @@ const UIManager = {
       lastCleanedTime: timeString
     });
   },
- 
+
   /**
    * Met à jour l'affichage des statistiques
    * @param {number} bookmarksCount - Nombre de sites favoris
@@ -204,8 +204,8 @@ const UIManager = {
           });
           this.elements.lastCleanedTime.innerText = `${formattedDate} ${formattedTime}`;
         } catch (e) {
-          console.error("Erreur de formatage de la date:", lastCleanedTime, e);
-          this.elements.lastCleanedTime.innerText = 'Date invalide';
+          console.error(chrome.i18n.getMessage('errorFormattingDate'), lastCleanedTime, e); // Assuming you'll add this key
+          this.elements.lastCleanedTime.innerText = chrome.i18n.getMessage('invalidDateFormat');
         }
       } else {
         this.elements.lastCleanedTime.innerText = '-';
@@ -218,8 +218,8 @@ const UIManager = {
    * @param {string} message
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
-  setStatus(message, type = 'info') {
-    if (!this.elements.statusMessage) return;
+   setStatus(message, type = 'info') {
+     if (!this.elements.statusMessage) return;
     if (this.elements.settingsPanel) {
     }
 
@@ -230,7 +230,7 @@ const UIManager = {
 
   /**
    * Affiche un message de statut
-   * @param {string} message 
+   * @param {string} message
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
   setStatus(message, type = 'info') {
@@ -244,15 +244,15 @@ const UIManager = {
     // Ajouter la classe en fonction du type
     if (type) {
       this.elements.statusMessage.classList.add(`status-${type}`);
-    }
-  },
+      }
+    },
 
   /**
    * Ajoute un résultat à la section des résultats
-   * @param {string} message 
+   * @param {string} message
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
-  addResult(message, type = 'info') {
+   addResult(message, type = 'info') {
     if (!this.elements.results) return;
 
     const p = document.createElement('p');
@@ -264,10 +264,10 @@ const UIManager = {
 
   /**
    * Ajoute une liste à la section des résultats
-   * @param {Array} items 
+   * @param {Array} items
    * @param {string} type - 'info', 'warning', 'error'
    */
-  addResultList(items, type = 'info') {
+   addResultList(items, type = 'info') {
     if (!items || items.length === 0 || !this.elements.results) return;
 
     const ul = document.createElement('ul');
@@ -280,13 +280,14 @@ const UIManager = {
     });
 
     this.elements.results.appendChild(ul);
-  },
+  }
+},
 
-  /**
-   * Efface tous les résultats affichés
-   */
-  clearResults() {
-    if (this.elements.results) {
+/**
+ * Efface tous les résultats affichés
+ */
+clearResults() {
+  if (this.elements.results) {
       this.elements.results.innerHTML = '';
     }
     this.setStatus('');
@@ -294,7 +295,7 @@ const UIManager = {
 
   /**
    * Active/désactive le bouton de nettoyage
-   * @param {boolean} enabled 
+   * @param {boolean} enabled
    */
   setCleanButtonEnabled(enabled) {
     if (this.elements.cleanButton) {
@@ -339,12 +340,12 @@ const CleaningManager = {
   /**
    * Exécute le processus de nettoyage
    */
-  async executeCleanup() {
-    UIManager.clearResults();
-    UIManager.setStatus('Nettoyage en cours...', 'info');
-    UIManager.setCleanButtonEnabled(false);
+   async executeCleanup() {
+     UIManager.clearResults();
+     UIManager.setStatus(chrome.i18n.getMessage('statusCleaningInProgress'), 'info');
+     UIManager.setCleanButtonEnabled(false);
 
-    try {
+     try {
       // Récupérer les origines des favoris
       const {
         origins,
@@ -354,7 +355,7 @@ const CleaningManager = {
       // Afficher les URL invalides si nécessaire
       if (invalidUrls.length > 0) {
         UIManager.addResult(
-          `Attention: ${invalidUrls.length} URL(s) invalide(s) trouvée(s) dans les favoris:`,
+         chrome.i18n.getMessage('statusInvalidUrlsFound', [invalidUrls.length]),
           'warning'
         );
         UIManager.addResultList(invalidUrls, 'warning');
@@ -381,7 +382,7 @@ const CleaningManager = {
         if (msg.status === "done") {
           const domainsCount = origins.length;
           UIManager.addResult(
-            `Nettoyage terminé avec succès! ${domainsCount} domaine(s) préservé(s).`,
+           chrome.i18n.getMessage('statusCleaningSuccess', [domainsCount]),
             'success'
           );
 
@@ -415,22 +416,22 @@ const CleaningManager = {
 
         if (chrome.runtime.lastError) {
           UIManager.addResult(
-            `La connexion avec le service de nettoyage a été interrompue: ${chrome.runtime.lastError.message}`,
+           chrome.i18n.getMessage('statusPortDisconnectedErrorDetail', [chrome.runtime.lastError.message]),
             'error'
           );
         } else {
           UIManager.addResult(
-            'La connexion avec le service de nettoyage a été interrompue.',
+           chrome.i18n.getMessage('statusPortDisconnectedError'),
             'error'
           );
         }
       });
 
     } catch (error) {
-      console.error("Erreur pendant le processus de nettoyage:", error);
+      console.error(chrome.i18n.getMessage('errorDuringCleanup'), error); // Assuming you'll add this key
       UIManager.setCleanButtonEnabled(true);
       UIManager.setStatus('');
-      UIManager.addResult(`Erreur: ${error.message}`, 'error');
+      UIManager.addResult(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
     }
   }
 };
@@ -488,7 +489,7 @@ async function loadAndDisplayStats() {
     UIManager.updateStats(bookmarksCount, lastCleanedTime);
 
   } catch (error) {
-    console.error("Erreur lors du chargement ou de l'affichage des statistiques:", error);
+    console.error(chrome.i18n.getMessage('errorLoadingOrDisplayingStats'), error); // Assuming you'll add this key
     UIManager.updateStats(-1, null); // Afficher des tirets en cas d'erreur
     // Potentiellement afficher une erreur dans les logs si nécessaire
   }

@@ -1,0 +1,102 @@
+{
+  "extName": {
+    "message": "Clean Data - Bookmarks Whitelist",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Deletes all data except for bookmarked sites",
+    "description": "Extension description"
+  },
+  "popupTitle": {
+    "message": "Navigation Cleaner",
+    "description": "Title of the popup window"
+  },
+  "cleanButtonText": {
+    "message": "Clean Now",
+    "description": "Text on the main clean button"
+  },
+  "advancedSettingsToggleLabel": {
+    "message": "Advanced Settings",
+    "description": "Label for the advanced settings toggle"
+  },
+  "dataTypesHeader": {
+    "message": "Data Types to Clean:",
+    "description": "Header for the data types section"
+  },
+  "cookiesLabel": {
+    "message": "Cookies",
+    "description": "Label for cookies checkbox"
+  },
+  "cacheLabel": {
+    "message": "Cache",
+    "description": "Label for cache checkbox"
+  },
+  "indexedDBLabel": {
+    "message": "IndexedDB",
+    "description": "Label for IndexedDB checkbox"
+  },
+  "localStorageLabel": {
+    "message": "LocalStorage",
+    "description": "Label for LocalStorage checkbox"
+  },
+  "serviceWorkersLabel": {
+    "message": "Service Workers",
+    "description": "Label for Service Workers checkbox"
+  },
+  "showLogsToggleLabel": {
+    "message": "Show detailed logs",
+    "description": "Label for the show logs toggle"
+  },
+  "statsHeader": {
+    "message": "Statistics",
+    "description": "Header for the statistics panel"
+  },
+  "bookmarksCountLabel": {
+    "message": "Bookmarked Sites",
+    "description": "Label for the bookmarked sites count statistic"
+  },
+  "lastCleanedTimeLabel": {
+    "message": "Last Cleaned",
+    "description": "Label for the last cleaned time statistic"
+  },
+  "resetButtonText": {
+    "message": "Reset",
+    "description": "Text on the reset button"
+  },
+  "githubLinkText": {
+    "message": "GitHub",
+    "description": "Text for the GitHub link"
+  },
+  "statusCleaningInProgress": {
+    "message": "Cleaning in progress...",
+    "description": "Status message when cleaning starts"
+  },
+  "statusInvalidUrlsFound": {
+    "message": "Warning: $1 invalid URL(s) found in bookmarks:",
+    "description": "Warning message when invalid URLs are found. $1 is the count."
+  },
+  "statusCleaningSuccess": {
+    "message": "Cleaning successful! $1 domain(s) preserved.",
+    "description": "Success message after cleaning. $1 is the number of preserved domains."
+  },
+  "statusCleaningError": {
+    "message": "Error during cleaning: $1",
+    "description": "Error message during cleaning. $1 is the error message."
+  },
+  "statusConnectionInterrupted": {
+    "message": "Connection to cleaning service was interrupted.",
+    "description": "Error message when the connection to background script is lost."
+  },
+  "statusConnectionInterruptedError": {
+    "message": "Connection to cleaning service was interrupted: $1",
+    "description": "Error message when the connection to background script is lost, with error details. $1 is the error message."
+  },
+  "statusGenericError": {
+    "message": "Error: $1",
+    "description": "Generic error message. $1 is the error message."
+  },
+  "invalidDateText": {
+    "message": "Invalid Date",
+    "description": "Text shown when the last cleaned date cannot be formatted."
+  }
+}
