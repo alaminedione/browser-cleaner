@@ -168,7 +168,17 @@ const UIManager = {
       advancedSettingsVisible: visible
     });
   },
-
+ 
+  /**
+   * Sauvegarde la dernière heure de nettoyage dans le stockage
+   * @param {string} timeString - Date/heure du dernier nettoyage (format ISO string)
+   */
+  saveLastCleanedTime(timeString) {
+    chrome.storage.sync.set({
+      lastCleanedTime: timeString
+    });
+  },
+ 
   /**
    * Met à jour l'affichage des statistiques
    * @param {number} bookmarksCount - Nombre de sites favoris
