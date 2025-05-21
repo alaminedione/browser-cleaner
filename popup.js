@@ -151,7 +151,7 @@ const UIManager = {
         }
       });
     } catch (error) {
-      console.error("Erreur lors du chargement des paramètres:", error);
+      console.error(chrome.i18n.getMessage('errorLoadingSettings'), error); // Assuming 'errorLoadingSettings' key will be added
     }
   },
 
@@ -218,21 +218,6 @@ const UIManager = {
    * @param {string} message
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
-   setStatus(message, type = 'info') {
-     if (!this.elements.statusMessage) return;
-    if (this.elements.settingsPanel) {
-    }
-
-    chrome.storage.sync.set({
-      advancedSettingsVisible: visible
-    });
-  },
-
-  /**
-   * Affiche un message de statut
-   * @param {string} message
-   * @param {string} type - 'info', 'success', 'error', 'warning'
-   */
   setStatus(message, type = 'info') {
     if (!this.elements.statusMessage) return;
 
@@ -280,14 +265,13 @@ const UIManager = {
     });
 
     this.elements.results.appendChild(ul);
-  }
-},
+  },
 
-/**
- * Efface tous les résultats affichés
- */
-clearResults() {
-  if (this.elements.results) {
+  /**
+   * Efface tous les résultats affichés
+   */
+  clearResults() {
+    if (this.elements.results) {
       this.elements.results.innerHTML = '';
     }
     this.setStatus('');
@@ -398,9 +382,9 @@ const CleaningManager = {
           UIManager.saveLastCleanedTime(msg.log.endTime);
 
         } else if (msg.status === "error") {
-          UIManager.addResult(`Erreur lors du nettoyage: ${msg.message}`, 'error');
+          UIManager.addResult(chrome.i18n.getMessage('statusCleaningError', [msg.message]), 'error');
 
-          // Afficher les logs en cas d'erreur si l'option est activée
+          // Afficher les logs en cas d\'erreur si l\'option est activée
           if (UIManager.elements.showLogsToggle?.checked && msg.log) {
             chrome.tabs.create({
               url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log))

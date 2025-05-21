@@ -3,6 +3,7 @@
   "name": "Clean Data - Bookmarks Whitelist",
   "version": "1.1",
   "description": "Supprime toutes les données sauf celles des bookmarks",
+  "default_locale": "fr",
   "permissions": [
     "bookmarks",
     "browsingData",

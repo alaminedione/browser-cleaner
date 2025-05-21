@@ -12,24 +12,7 @@ const CONFIG = {
     localStorage: true,  // Ajout du localStorage
     serviceWorkers: true // Ajout des service workers
   },
-  i18n: {
-    fr: {
-      cleaningStarted: 'Nettoyage en cours...',
-      cleaningSuccess: 'Nettoyage réussi',
-      cleaningSuccessDetail: (excludedCount) =>
-        `Vos données de navigation ont été nettoyées avec succès ! (${excludedCount} sites favoris préservés)`,
-      cleaningFailed: 'Échec du nettoyage',
-      cleaningFailedDetail: (error) => `Une erreur est survenue : ${error}`
-    },
-    en: {
-      cleaningStarted: 'Cleaning in progress...',
-      cleaningSuccess: 'Cleaning completed',
-      cleaningSuccessDetail: (excludedCount) =>
-        `Your browsing data has been successfully cleaned! (${excludedCount} bookmarked sites preserved)`,
-      cleaningFailed: 'Cleaning failed',
-      cleaningFailedDetail: (error) => `An error occurred: ${error}`
-    }
-  },
+
   logLevel: 'info' // 'debug', 'info', 'warn', 'error'
 };
 
@@ -57,18 +40,8 @@ const Utils = {
       }
     }
   },
-  getLanguage: () => {
-    const userLang = chrome.i18n.getUILanguage().split('-')[0];
-    return CONFIG.i18n[userLang] ? userLang : 'en';
-  },
-  getText: (key, ...params) => {
-    const lang = Utils.getLanguage();
-    const text = CONFIG.i18n[lang][key];
-    if (typeof text === 'function') {
-      return text(...params);
-    }
-    return text;
-  },
+
+
   showNotification: (type, title, message) => {
     chrome.notifications.create({
       type: 'basic',
@@ -85,7 +58,7 @@ const CleaningService = {
   showProgressNotification() {
     Utils.showNotification(
       'progress',
-      Utils.getText('cleaningStarted'),
+      chrome.i18n.getMessage('notification_cleaning_started'),
       ''
     );
   },
@@ -115,15 +88,15 @@ const CleaningService = {
     if (error) {
       Utils.showNotification(
         'error',
-        Utils.getText('cleaningFailed'),
-        Utils.getText('cleaningFailedDetail', error.message)
+        chrome.i18n.getMessage('notification_cleaning_failed_title'),
+        chrome.i18n.getMessage('notification_cleaning_failed_detail', [error.message])
       );
       port.postMessage({ status: "error", message: error.message, log: logDetails });
     } else {
       Utils.showNotification(
         'success',
-        Utils.getText('cleaningSuccess'),
-        Utils.getText('cleaningSuccessDetail', excludedOrigins.length)
+        chrome.i18n.getMessage('notification_cleaning_success_title'),
+        chrome.i18n.getMessage('notification_cleaning_success_detail', [excludedOrigins.length])
       );
       port.postMessage({ status: "done", log: logDetails });
     }

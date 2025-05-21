@@ -98,5 +98,17 @@
   "invalidDateText": {
     "message": "Invalid Date",
     "description": "Text shown when the last cleaned date cannot be formatted."
+  },
+  "errorLoadingSettings": {
+    "message": "Error loading settings:",
+    "description": "Console error message when loading settings fails."
+  },
+  "errorDuringCleanup": {
+    "message": "Error during cleanup process:",
+    "description": "Console error message during the cleaning process."
+  },
+  "errorLoadingOrDisplayingStats": {
+    "message": "Error loading or displaying statistics:",
+    "description": "Console error message when loading/displaying stats fails."
   }
 }

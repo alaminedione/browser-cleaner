@@ -1,53 +1,53 @@
 {
-  "extension_name": {
+  "extName": {
     "message": "Nettoyage de Navigation"
   },
-  "clean_now_button": {
+  "cleanButtonText": {
     "message": "Nettoyer maintenant"
   },
-  "advanced_settings_toggle": {
+  "advancedSettingsToggleLabel": {
     "message": "Paramètres avancés"
   },
-  "data_types_heading": {
+  "dataTypesHeader": {
     "message": "Types de données à nettoyer :"
   },
-  "data_type_cookies": {
+  "cookiesLabel": {
     "message": "Cookies"
   },
-  "data_type_cache": {
+  "cacheLabel": {
     "message": "Cache"
   },
-  "data_type_indexeddb": {
+  "indexedDBLabel": {
     "message": "IndexedDB"
   },
-  "data_type_localstorage": {
+  "localStorageLabel": {
     "message": "LocalStorage"
   },
-  "data_type_serviceworkers": {
+  "serviceWorkersLabel": {
     "message": "Service Workers"
   },
-  "show_detailed_logs_toggle": {
+  "showLogsToggleLabel": {
     "message": "Afficher les logs détaillés"
   },
-  "statistics_heading": {
+  "statsHeader": {
     "message": "Statistiques"
   },
-  "stats_bookmarks_label": {
+  "bookmarksCountLabel": {
     "message": "Sites favoris"
   },
-  "stats_last_cleaned_label": {
+  "lastCleanedTimeLabel": {
     "message": "Dernier nettoyage"
   },
-  "reset_button": {
+  "resetButtonText": {
     "message": "Réinitialiser"
   },
-  "github_link_text": {
+  "githubLinkText": {
     "message": "GitHub"
   },
-  "status_cleaning_in_progress": {
+  "statusCleaningInProgress": {
     "message": "Nettoyage en cours..."
   },
-  "status_invalid_urls_warning": {
+  "statusInvalidUrlsFound": {
     "message": "Attention : $1 URL(s) invalide(s) trouvée(s) dans les favoris :",
     "placeholders": {
       "1": {
@@ -55,7 +55,7 @@
       }
     }
   },
-  "status_cleaning_success": {
+  "statusCleaningSuccess": {
     "message": "Nettoyage terminé avec succès ! $1 domaine(s) préservé(s).",
     "placeholders": {
       "1": {
@@ -63,7 +63,7 @@
       }
     }
   },
-  "status_cleaning_error": {
+  "statusCleaningError": {
     "message": "Erreur lors du nettoyage : $1",
     "placeholders": {
       "1": {
@@ -71,7 +71,7 @@
       }
     }
   },
-  "status_port_disconnected_error_detail": {
+  "statusConnectionInterruptedError": {
     "message": "La connexion avec le service de nettoyage a été interrompue : $1",
     "placeholders": {
       "1": {
@@ -79,10 +79,10 @@
       }
     }
   },
-  "status_port_disconnected_error": {
+  "statusConnectionInterrupted": {
     "message": "La connexion avec le service de nettoyage a été interrompue."
   },
-  "status_generic_error": {
+  "statusGenericError": {
     "message": "Erreur : $1",
     "placeholders": {
       "1": {
@@ -90,7 +90,7 @@
       }
     }
   },
-  "invalid_date_format": {
+  "invalidDateText": {
     "message": "Date invalide"
   },
   "notification_cleaning_started": {
@@ -117,5 +117,17 @@
         "content": "%s"
       }
     }
+  },
+  "errorLoadingSettings": {
+    "message": "Erreur lors du chargement des paramètres :",
+    "description": "Console error message when loading settings fails."
+  },
+  "errorDuringCleanup": {
+    "message": "Erreur pendant le processus de nettoyage :",
+    "description": "Console error message during the cleaning process."
+  },
+  "errorLoadingOrDisplayingStats": {
+    "message": "Erreur lors du chargement ou de l'affichage des statistiques :",
+    "description": "Console error message when loading/displaying stats fails."
   }
 }
