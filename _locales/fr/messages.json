@@ -345,5 +345,212 @@
   },
   "portDisconnectedWarning": {
     "message": "Tentative d'envoi de message sur un port déconnecté."
+  },
+  "noLogDataFoundInUrl": {
+    "message": "Aucune donnée de log trouvée dans l'URL"
+  },
+  "logsScriptTitle": {
+    "message": "Script d'affichage des logs"
+  },
+  "logsScriptDescription": {
+    "message": "Affiche et gère les détails des opérations de nettoyage"
+  },
+  "summarySectionTitle": {
+    "message": "Résumé"
+  },
+  "tabsSectionTitle": {
+    "message": "Onglets"
+  },
+  "tabContentSectionTitle": {
+    "message": "Contenu des onglets"
+  },
+  "buttonsSectionTitle": {
+    "message": "Boutons"
+  },
+  "initElementsDescription": {
+    "message": "Initialise les éléments de l'interface"
+  },
+  "setupEventListenersDescription": {
+    "message": "Configure les écouteurs d'événements"
+  },
+  "tabManagementComment": {
+    "message": "Gestion des onglets"
+  },
+  "backButtonComment": {
+    "message": "Bouton de retour"
+  },
+  "exportButtonComment": {
+    "message": "Bouton d'exportation"
+  },
+  "jsonButtonsComment": {
+    "message": "Boutons JSON"
+  },
+  "domainSearchComment": {
+    "message": "Recherche de domaines"
+  },
+  "switchTabDescription": {
+    "message": "Change l'onglet actif"
+  },
+  "tabIdParamDescription": {
+    "message": "Identifiant de l'onglet à activer"
+  },
+  "deactivateAllTabsComment": {
+    "message": "Désactiver tous les onglets"
+  },
+  "activateSelectedTabComment": {
+    "message": "Activer l'onglet sélectionné"
+  },
+  "exportLogDataDescription": {
+    "message": "Exporte les données de log au format JSON"
+  },
+  "dataToExportParamDescription": {
+    "message": "Données à exporter"
+  },
+  "createDownloadLinkComment": {
+    "message": "Créer un lien de téléchargement"
+  },
+  "cleanupComment": {
+    "message": "Nettoyer"
+  },
+  "copyToClipboardDescription": {
+    "message": "Copie le contenu dans le presse-papier"
+  },
+  "textToCopyParamDescription": {
+    "message": "Texte à copier"
+  },
+  "temporaryVisualFeedbackComment": {
+    "message": "Retour visuel temporaire"
+  },
+  "toggleJsonFormatDescription": {
+    "message": "Bascule entre format JSON compact et formaté"
+  },
+  "switchToCompactFormatComment": {
+    "message": "Passer au format compact"
+  },
+  "switchToFormattedFormatComment": {
+    "message": "Passer au format formaté"
+  },
+  "filterDomainsDescription": {
+    "message": "Filtre la liste des domaines par recherche"
+  },
+  "searchTermParamDescription": {
+    "message": "Terme de recherche"
+  },
+  "displaySummaryDescription": {
+    "message": "Affiche les données de résumé"
+  },
+  "logDataParamDescription": {
+    "message": "Données de log"
+  },
+  "statusComment": {
+    "message": "Status"
+  },
+  "dateComment": {
+    "message": "Date"
+  },
+  "durationComment": {
+    "message": "Durée"
+  },
+  "preservedSitesComment": {
+    "message": "Sites préservés"
+  },
+  "displayDetailsDescription": {
+    "message": "Affiche les détails de l'opération"
+  },
+  "clearDetailsTableComment": {
+    "message": "Vider la table des détails"
+  },
+  "operationDataComment": {
+    "message": "Données de l'opération"
+  },
+  "addRowToTableComment": {
+    "message": "Ajouter chaque ligne à la table"
+  },
+  "displayErrorInformationComment": {
+    "message": "Afficher les informations d'erreur si présentes"
+  },
+  "displayDomainsDescription": {
+    "message": "Affiche la liste des domaines préservés"
+  },
+  "clearDomainsListComment": {
+    "message": "Vider la liste des domaines"
+  },
+  "sortDomainsAlphabeticallyComment": {
+    "message": "Trier les domaines par ordre alphabétique"
+  },
+  "createElementForEachDomainComment": {
+    "message": "Créer un élément pour chaque domaine"
+  },
+  "tryExtractDomainNameFromUrlComment": {
+    "message": "Essayer d'extraire le nom de domaine à partir de l'URL"
+  },
+  "fallbackInvalidUrlComment": {
+    "message": "Fallback si l'URL est invalide"
+  },
+  "displayRawJsonDescription": {
+    "message": "Affiche les données JSON brutes"
+  },
+  "displayFormattedJsonDataComment": {
+    "message": "Afficher les données JSON formatées"
+  },
+  "mainEntryPointTitle": {
+    "message": "Point d'entrée principal"
+  },
+  "initializeUIComment": {
+    "message": "Initialiser l'interface utilisateur"
+  },
+  "retrieveAndProcessLogDataComment": {
+    "message": "Récupérer et traiter les données de log"
+  },
+  "displayDataInUIComment": {
+    "message": "Afficher les données dans l'interface"
+  },
+  "displayErrorMessageComment": {
+    "message": "Afficher un message d'erreur"
+  },
+  "logsPageTitle": {
+    "message": "Logs de Nettoyage"
+  },
+  "logsPageHeader": {
+    "message": "Logs de Nettoyage"
+  },
+  "backButtonText": {
+    "message": "Retour"
+  },
+  "statusLabel": {
+    "message": "Statut"
+  },
+  "dateLabel": {
+    "message": "Date"
+  },
+  "detailsTab": {
+    "message": "Détails"
+  },
+  "domainsTab": {
+    "message": "Domaines préservés"
+  },
+  "rawJsonTab": {
+    "message": "JSON brut"
+  },
+  "operationInfoTitle": {
+    "message": "Informations sur l'opération"
+  },
+  "loadingText": {
+    "message": "Chargement..."
+  },
+  "searchDomainPlaceholder": {
+    "message": "Rechercher un domaine..."
+  },
+  "loadingDomainsText": {
+    "message": "Chargement des domaines..."
+  },
+  "copyButtonText": {
+    "message": "Copier"
+  },
+  "browserCleanerFooter": {
+    "message": "Browser Cleaner"
+  },
+  "versionText": {
+    "message": "v1.0"
   }
 }

@@ -1,6 +1,6 @@
 /**
- * Browser Cleaner - Script d'affichage des logs
- * Affiche et gère les détails des opérations de nettoyage
+ * Browser Cleaner - ${chrome.i18n.getMessage('logsScriptTitle')}
+ * ${chrome.i18n.getMessage('logsScriptDescription')}
  */
 
 // Gestionnaire des données de logs
@@ -17,7 +17,7 @@ const LogDataManager = {
       const logParam = urlParams.get('log');
 
       if (!logParam) {
-        throw new Error('Aucune donnée de log trouvée dans l\'URL');
+        throw new Error(chrome.i18n.getMessage('noLogDataFoundInUrl'));
       }
 
       return JSON.parse(decodeURIComponent(logParam));
@@ -67,17 +67,17 @@ const LogDataManager = {
 // Gestionnaire de l'interface des logs
 const LogUIManager = {
   elements: {
-    // Résumé
+    // ${chrome.i18n.getMessage('summarySectionTitle')}
     statusValue: null,
     dateValue: null,
     durationValue: null,
     preservedValue: null,
 
-    // Onglets
+    // ${chrome.i18n.getMessage('tabsSectionTitle')}
     tabButtons: null,
     tabContents: null,
 
-    // Contenu des onglets
+    // ${chrome.i18n.getMessage('tabContentSectionTitle')}
     detailsTable: null,
     errorSection: null,
     errorMessage: null,
@@ -86,7 +86,7 @@ const LogUIManager = {
     domainSearch: null,
     rawJson: null,
 
-    // Boutons
+    // ${chrome.i18n.getMessage('buttonsSectionTitle')}
     exportBtn: null,
     goBackBtn: null,
     copyJsonBtn: null,
@@ -94,20 +94,20 @@ const LogUIManager = {
   },
 
   /**
-   * Initialise les éléments de l'interface
+   * ${chrome.i18n.getMessage('initElementsDescription')}
    */
   initElements() {
-    // Résumé
+    // ${chrome.i18n.getMessage('summarySectionTitle')}
     this.elements.statusValue = document.getElementById('statusValue');
     this.elements.dateValue = document.getElementById('dateValue');
     this.elements.durationValue = document.getElementById('durationValue');
     this.elements.preservedValue = document.getElementById('preservedValue');
 
-    // Onglets
+    // ${chrome.i18n.getMessage('tabsSectionTitle')}
     this.elements.tabButtons = document.querySelectorAll('.tab-btn');
     this.elements.tabContents = document.querySelectorAll('.tab-content');
 
-    // Contenu des onglets
+    // ${chrome.i18n.getMessage('tabContentSectionTitle')}
     this.elements.detailsTable = document.getElementById('detailsTable');
     this.elements.errorSection = document.getElementById('errorSection');
     this.elements.errorMessage = document.getElementById('errorMessage');
@@ -116,7 +116,7 @@ const LogUIManager = {
     this.elements.domainSearch = document.getElementById('domainSearch');
     this.elements.rawJson = document.getElementById('rawJson');
 
-    // Boutons
+    // ${chrome.i18n.getMessage('buttonsSectionTitle')}
     this.elements.exportBtn = document.getElementById('exportBtn');
     this.elements.goBackBtn = document.getElementById('goBackBtn');
     this.elements.copyJsonBtn = document.getElementById('copyJsonBtn');
@@ -124,27 +124,27 @@ const LogUIManager = {
   },
 
   /**
-   * Configure les écouteurs d'événements
+   * ${chrome.i18n.getMessage('setupEventListenersDescription')}
    */
   setupEventListeners() {
-    // Gestion des onglets
+    // ${chrome.i18n.getMessage('tabManagementComment')}
     this.elements.tabButtons.forEach(button => {
       button.addEventListener('click', () => {
         this.switchTab(button.dataset.tab);
       });
     });
 
-    // Bouton de retour
+    // ${chrome.i18n.getMessage('backButtonComment')}
     this.elements.goBackBtn?.addEventListener('click', () => {
       window.close();
     });
 
-    // Bouton d'exportation
+    // ${chrome.i18n.getMessage('exportButtonComment')}
     this.elements.exportBtn?.addEventListener('click', () => {
       this.exportLogData(LogDataManager.logData);
     });
 
-    // Boutons JSON
+    // ${chrome.i18n.getMessage('jsonButtonsComment')}
     this.elements.copyJsonBtn?.addEventListener('click', () => {
       this.copyToClipboard(this.elements.rawJson.textContent);
     });
@@ -153,18 +153,18 @@ const LogUIManager = {
       this.toggleJsonFormat();
     });
 
-    // Recherche de domaines
+    // ${chrome.i18n.getMessage('domainSearchComment')}
     this.elements.domainSearch?.addEventListener('input', (e) => {
       this.filterDomains(e.target.value);
     });
   },
 
   /**
-   * Change l'onglet actif
-   * @param {string} tabId - Identifiant de l'onglet à activer
+   * ${chrome.i18n.getMessage('switchTabDescription')}
+   * @param {string} tabId - ${chrome.i18n.getMessage('tabIdParamDescription')}
    */
   switchTab(tabId) {
-    // Désactiver tous les onglets
+    // ${chrome.i18n.getMessage('deactivateAllTabsComment')}
     this.elements.tabButtons.forEach(btn => {
       btn.classList.remove('active');
     });
@@ -173,14 +173,14 @@ const LogUIManager = {
       content.classList.remove('active');
     });
 
-    // Activer l'onglet sélectionné
+    // ${chrome.i18n.getMessage('activateSelectedTabComment')}
     document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
     document.getElementById(tabId).classList.add('active');
   },
 
   /**
-   * Exporte les données de log au format JSON
-   * @param {Object} data - Données à exporter
+   * ${chrome.i18n.getMessage('exportLogDataDescription')}
+   * @param {Object} data - ${chrome.i18n.getMessage('dataToExportParamDescription')}
    */
   exportLogData(data) {
     if (!data) return;
@@ -189,14 +189,14 @@ const LogUIManager = {
     const blob = new Blob([jsonString], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
-    // Créer un lien de téléchargement
+    // ${chrome.i18n.getMessage('createDownloadLinkComment')}
     const a = document.createElement('a');
     a.href = url;
     a.download = `browser-cleaner-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
     document.body.appendChild(a);
     a.click();
 
-    // Nettoyer
+    // ${chrome.i18n.getMessage('cleanupComment')}
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
@@ -204,13 +204,13 @@ const LogUIManager = {
   },
 
   /**
-   * Copie le contenu dans le presse-papier
-   * @param {string} text - Texte à copier
+   * ${chrome.i18n.getMessage('copyToClipboardDescription')}
+   * @param {string} text - ${chrome.i18n.getMessage('textToCopyParamDescription')}
    */
   copyToClipboard(text) {
     navigator.clipboard.writeText(text)
       .then(() => {
-        // Retour visuel temporaire
+        // ${chrome.i18n.getMessage('temporaryVisualFeedbackComment')}
         const originalText = this.elements.copyJsonBtn.textContent;
         this.elements.copyJsonBtn.textContent = chrome.i18n.getMessage('copiedText');
         setTimeout(() => {
@@ -223,14 +223,14 @@ const LogUIManager = {
   },
 
   /**
-   * Bascule entre format JSON compact et formaté
+   * ${chrome.i18n.getMessage('toggleJsonFormatDescription')}
    */
   toggleJsonFormat() {
     const rawJson = this.elements.rawJson;
     const button = this.elements.formatJsonBtn;
 
     if (button.classList.contains('active')) {
-      // Passer au format compact
+      // ${chrome.i18n.getMessage('switchToCompactFormatComment')}
       try {
         const jsonData = JSON.parse(rawJson.textContent);
         rawJson.textContent = JSON.stringify(jsonData);
@@ -239,7 +239,7 @@ const LogUIManager = {
         console.error(chrome.i18n.getMessage('errorParsingJson'), error);
       }
     } else {
-      // Passer au format formaté
+      // ${chrome.i18n.getMessage('switchToFormattedFormatComment')}
       try {
         const jsonData = JSON.parse(rawJson.textContent);
         rawJson.textContent = JSON.stringify(jsonData, null, 2);
@@ -253,8 +253,8 @@ const LogUIManager = {
   },
 
   /**
-   * Filtre la liste des domaines par recherche
-   * @param {string} searchTerm - Terme de recherche
+   * ${chrome.i18n.getMessage('filterDomainsDescription')}
+   * @param {string} searchTerm - ${chrome.i18n.getMessage('searchTermParamDescription')}
    */
   filterDomains(searchTerm) {
     const domainItems = document.querySelectorAll('.domain-item');
@@ -271,55 +271,55 @@ const LogUIManager = {
   },
 
   /**
-   * Affiche les données de résumé
-   * @param {Object} logData - Données de log
+   * ${chrome.i18n.getMessage('displaySummaryDescription')}
+   * @param {Object} logData - ${chrome.i18n.getMessage('logDataParamDescription')}
    */
   displaySummary(logData) {
     if (!logData) return;
 
-    // Status
+    // ${chrome.i18n.getMessage('statusComment')}
     if (this.elements.statusValue) {
       this.elements.statusValue.textContent = logData.success ? chrome.i18n.getMessage('statusSuccess') : chrome.i18n.getMessage('statusFailure');
       this.elements.statusValue.className = 'summary-value ' + (logData.success ? 'success' : 'error');
     }
 
-    // Date
+    // ${chrome.i18n.getMessage('dateComment')}
     if (this.elements.dateValue) {
       this.elements.dateValue.textContent = LogDataManager.formatDate(logData.startTime);
     }
 
-    // Durée
+    // ${chrome.i18n.getMessage('durationComment')}
     if (this.elements.durationValue) {
       this.elements.durationValue.textContent = LogDataManager.formatDuration(logData.duration);
     }
 
-    // Sites préservés
+    // ${chrome.i18n.getMessage('preservedSitesComment')}
     if (this.elements.preservedValue) {
       this.elements.preservedValue.textContent = logData.excludedOrigins?.count || 0;
     }
   },
 
   /**
-   * Affiche les détails de l'opération
-   * @param {Object} logData - Données de log
+   * ${chrome.i18n.getMessage('displayDetailsDescription')}
+   * @param {Object} logData - ${chrome.i18n.getMessage('logDataParamDescription')}
    */
   displayDetails(logData) {
     if (!logData || !this.elements.detailsTable) return;
 
-    // Vider la table des détails
+    // ${chrome.i18n.getMessage('clearDetailsTableComment')}
     this.elements.detailsTable.innerHTML = '';
 
-    // Données de l'opération
+    // ${chrome.i18n.getMessage('operationDataComment')}
     const details = [
       { label: chrome.i18n.getMessage('operationLabel'), value: logData.operation || chrome.i18n.getMessage('cleanupOperation') },
       { label: chrome.i18n.getMessage('startTimeLabel'), value: LogDataManager.formatDate(logData.startTime) },
       { label: chrome.i18n.getMessage('endTimeLabel'), value: LogDataManager.formatDate(logData.endTime) },
       { label: chrome.i18n.getMessage('durationLabel'), value: LogDataManager.formatDuration(logData.duration) },
       { label: chrome.i18n.getMessage('preservedSitesLabel'), value: logData.excludedOrigins?.count || 0 },
-      { label: chrome.i18n.getMessage('dataTypesCleanedLabel'), value: (logData.dataTypesRemoved || []).join(', ') }
+      { label: chrome.i18n.getMessage('dataTypesCleanedLabel'), value: (logData.dataTypesRemoved || []).map(type => chrome.i18n.getMessage(type + 'Label')).join(', ') }
     ];
 
-    // Ajouter chaque ligne à la table
+    // ${chrome.i18n.getMessage('addRowToTableComment')}
     details.forEach(detail => {
       const row = document.createElement('tr');
 
@@ -336,7 +336,7 @@ const LogUIManager = {
       this.elements.detailsTable.appendChild(row);
     });
 
-    // Afficher les informations d'erreur si présentes
+    // ${chrome.i18n.getMessage('displayErrorInformationComment')}
     if (logData.error && this.elements.errorSection) {
       this.elements.errorSection.style.display = 'block';
 
@@ -353,13 +353,13 @@ const LogUIManager = {
   },
 
   /**
-   * Affiche la liste des domaines préservés
-   * @param {Object} logData - Données de log
+   * ${chrome.i18n.getMessage('displayDomainsDescription')}
+   * @param {Object} logData - ${chrome.i18n.getMessage('logDataParamDescription')}
    */
   displayDomains(logData) {
     if (!logData || !this.elements.domainsList) return;
 
-    // Vider la liste des domaines
+    // ${chrome.i18n.getMessage('clearDomainsListComment')}
     this.elements.domainsList.innerHTML = '';
 
     const domains = logData.excludedOrigins?.domains || [];
@@ -372,16 +372,16 @@ const LogUIManager = {
       return;
     }
 
-    // Trier les domaines par ordre alphabétique
+    // ${chrome.i18n.getMessage('sortDomainsAlphabeticallyComment')}
     domains.sort();
 
-    // Créer un élément pour chaque domaine
+    // ${chrome.i18n.getMessage('createElementForEachDomainComment')}
     domains.forEach(domain => {
       const domainItem = document.createElement('div');
       domainItem.className = 'domain-item';
 
       try {
-        // Essayer d'extraire le nom de domaine à partir de l'URL
+        // ${chrome.i18n.getMessage('tryExtractDomainNameFromUrlComment')}
         const url = new URL(domain);
         const favicon = document.createElement('img');
         favicon.className = 'favicon';
@@ -396,7 +396,7 @@ const LogUIManager = {
         domainItem.appendChild(favicon);
         domainItem.appendChild(domainText);
       } catch (error) {
-        // Fallback si l'URL est invalide
+        // ${chrome.i18n.getMessage('fallbackInvalidUrlComment')}
         domainItem.textContent = domain;
       }
 
@@ -405,37 +405,37 @@ const LogUIManager = {
   },
 
   /**
-   * Affiche les données JSON brutes
-   * @param {Object} logData - Données de log
+   * ${chrome.i18n.getMessage('displayRawJsonDescription')}
+   * @param {Object} logData - ${chrome.i18n.getMessage('logDataParamDescription')}
    */
   displayRawJson(logData) {
     if (!logData || !this.elements.rawJson) return;
 
-    // Afficher les données JSON formatées
+    // ${chrome.i18n.getMessage('displayFormattedJsonDataComment')}
     this.elements.rawJson.textContent = JSON.stringify(logData, null, 2);
   }
 };
 
 /**
- * Point d'entrée principal
+ * ${chrome.i18n.getMessage('mainEntryPointTitle')}
  */
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialiser l'interface utilisateur
+  // ${chrome.i18n.getMessage('initializeUIComment')}
   LogUIManager.initElements();
   LogUIManager.setupEventListeners();
 
-  // Récupérer et traiter les données de log
+  // ${chrome.i18n.getMessage('retrieveAndProcessLogDataComment')}
   const logData = LogDataManager.parseLogData();
   LogDataManager.logData = logData;
 
   if (logData) {
-    // Afficher les données dans l'interface
+    // ${chrome.i18n.getMessage('displayDataInUIComment')}
     LogUIManager.displaySummary(logData);
     LogUIManager.displayDetails(logData);
     LogUIManager.displayDomains(logData);
     LogUIManager.displayRawJson(logData);
   } else {
-    // Afficher un message d'erreur
+    // ${chrome.i18n.getMessage('displayErrorMessageComment')}
     document.body.innerHTML = `
       <div class="container error-container">
         <h1>${chrome.i18n.getMessage('errorTitle')}</h1>

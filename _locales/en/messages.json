@@ -324,5 +324,212 @@
   },
   "portDisconnectedWarning": {
     "message": "Attempting to send message on a disconnected port."
+  },
+  "noLogDataFoundInUrl": {
+    "message": "No log data found in URL"
+  },
+  "logsScriptTitle": {
+    "message": "Log Display Script"
+  },
+  "logsScriptDescription": {
+    "message": "Displays and manages cleanup operation details"
+  },
+  "summarySectionTitle": {
+    "message": "Summary"
+  },
+  "tabsSectionTitle": {
+    "message": "Tabs"
+  },
+  "tabContentSectionTitle": {
+    "message": "Tab Content"
+  },
+  "buttonsSectionTitle": {
+    "message": "Buttons"
+  },
+  "initElementsDescription": {
+    "message": "Initializes UI elements"
+  },
+  "setupEventListenersDescription": {
+    "message": "Sets up event listeners"
+  },
+  "tabManagementComment": {
+    "message": "Tab management"
+  },
+  "backButtonComment": {
+    "message": "Back button"
+  },
+  "exportButtonComment": {
+    "message": "Export button"
+  },
+  "jsonButtonsComment": {
+    "message": "JSON buttons"
+  },
+  "domainSearchComment": {
+    "message": "Domain search"
+  },
+  "switchTabDescription": {
+    "message": "Changes the active tab"
+  },
+  "tabIdParamDescription": {
+    "message": "ID of the tab to activate"
+  },
+  "deactivateAllTabsComment": {
+    "message": "Deactivate all tabs"
+  },
+  "activateSelectedTabComment": {
+    "message": "Activate selected tab"
+  },
+  "exportLogDataDescription": {
+    "message": "Exports log data in JSON format"
+  },
+  "dataToExportParamDescription": {
+    "message": "Data to export"
+  },
+  "createDownloadLinkComment": {
+    "message": "Create download link"
+  },
+  "cleanupComment": {
+    "message": "Cleanup"
+  },
+  "copyToClipboardDescription": {
+    "message": "Copies content to clipboard"
+  },
+  "textToCopyParamDescription": {
+    "message": "Text to copy"
+  },
+  "temporaryVisualFeedbackComment": {
+    "message": "Temporary visual feedback"
+  },
+  "toggleJsonFormatDescription": {
+    "message": "Toggles between compact and formatted JSON"
+  },
+  "switchToCompactFormatComment": {
+    "message": "Switch to compact format"
+  },
+  "switchToFormattedFormatComment": {
+    "message": "Switch to formatted format"
+  },
+  "filterDomainsDescription": {
+    "message": "Filters the list of domains by search term"
+  },
+  "searchTermParamDescription": {
+    "message": "Search term"
+  },
+  "displaySummaryDescription": {
+    "message": "Displays summary data"
+  },
+  "logDataParamDescription": {
+    "message": "Log data"
+  },
+  "statusComment": {
+    "message": "Status"
+  },
+  "dateComment": {
+    "message": "Date"
+  },
+  "durationComment": {
+    "message": "Duration"
+  },
+  "preservedSitesComment": {
+    "message": "Preserved Sites"
+  },
+  "displayDetailsDescription": {
+    "message": "Displays operation details"
+  },
+  "clearDetailsTableComment": {
+    "message": "Clear details table"
+  },
+  "operationDataComment": {
+    "message": "Operation data"
+  },
+  "addRowToTableComment": {
+    "message": "Add each row to the table"
+  },
+  "displayErrorInformationComment": {
+    "message": "Display error information if present"
+  },
+  "displayDomainsDescription": {
+    "message": "Displays the list of preserved domains"
+  },
+  "clearDomainsListComment": {
+    "message": "Clear domains list"
+  },
+  "sortDomainsAlphabeticallyComment": {
+    "message": "Sort domains alphabetically"
+  },
+  "createElementForEachDomainComment": {
+    "message": "Create an element for each domain"
+  },
+  "tryExtractDomainNameFromUrlComment": {
+    "message": "Try to extract domain name from URL"
+  },
+  "fallbackInvalidUrlComment": {
+    "message": "Fallback if URL is invalid"
+  },
+  "displayRawJsonDescription": {
+    "message": "Displays raw JSON data"
+  },
+  "displayFormattedJsonDataComment": {
+    "message": "Display formatted JSON data"
+  },
+  "mainEntryPointTitle": {
+    "message": "Main entry point"
+  },
+  "initializeUIComment": {
+    "message": "Initialize user interface"
+  },
+  "retrieveAndProcessLogDataComment": {
+    "message": "Retrieve and process log data"
+  },
+  "displayDataInUIComment": {
+    "message": "Display data in the interface"
+  },
+  "displayErrorMessageComment": {
+    "message": "Display an error message"
+  },
+  "logsPageTitle": {
+    "message": "Cleanup Logs"
+  },
+  "logsPageHeader": {
+    "message": "Cleanup Logs"
+  },
+  "backButtonText": {
+    "message": "Back"
+  },
+  "statusLabel": {
+    "message": "Status"
+  },
+  "dateLabel": {
+    "message": "Date"
+  },
+  "detailsTab": {
+    "message": "Details"
+  },
+  "domainsTab": {
+    "message": "Preserved Domains"
+  },
+  "rawJsonTab": {
+    "message": "Raw JSON"
+  },
+  "operationInfoTitle": {
+    "message": "Operation Information"
+  },
+  "loadingText": {
+    "message": "Loading..."
+  },
+  "searchDomainPlaceholder": {
+    "message": "Search domain..."
+  },
+  "loadingDomainsText": {
+    "message": "Loading domains..."
+  },
+  "copyButtonText": {
+    "message": "Copy"
+  },
+  "browserCleanerFooter": {
+    "message": "Browser Cleaner"
+  },
+  "versionText": {
+    "message": "v1.0"
   }
 }
