@@ -8,7 +8,7 @@
 const BookmarkManager = {
   /**
    * Récupère toutes les origines des URL en favoris
-   * @returns {Promise<{origins: string[], invalidUrls: string[]}>}
+   * @returns {Promise<{origins: string[], invalidUrls: string[], uniqueDomainsCount: number}>}
    */
   async getBookmarkOrigins() {
     try {
@@ -23,44 +23,37 @@ const BookmarkManager = {
   /**
    * Extrait les origines à partir des nœuds de favoris
    * @param {Array} nodes - Nœuds de favoris
-   * @returns {{origins: string[], invalidUrls: string[]}}
+   * @returns {{origins: string[], invalidUrls: string[], uniqueDomainsCount: number}}
    */
   extractOrigins(nodes) {
-    const origins = new Set();
+    const uniqueDomains = new Set(); // Pour stocker les noms de domaine uniques (sans protocole)
     const invalidUrls = [];
-    const processedDomains = new Set(); // Pour éviter le traitement en double des domaines
 
-    // Traite un nœud de façon récursive
+    // Fonction récursive pour traiter chaque nœud de favori
     const processNode = (node) => {
       if (node.url) {
         try {
           const url = new URL(node.url);
+          let hostname = url.hostname;
+          // Normaliser le hostname en supprimant 'www.'
+          if (hostname.startsWith('www.')) {
+            hostname = hostname.substring(4);
+          }
 
-          // Ajouter l'origine exacte
-          origins.add(url.origin);
+          // Ajouter le nom d'hôte (domaine) normalisé au Set uniqueDomains
+          uniqueDomains.add(hostname);
 
-          // Traitement des sous-domaines et domaines parents
-          const hostname = url.hostname;
-          if (!processedDomains.has(hostname)) {
-            processedDomains.add(hostname);
+          // Pour les sous-domaines, ajouter aussi le domaine parent normalisé
+          const domainParts = hostname.split('.');
+          if (domainParts.length > 1) { // Changed from > 2 to > 1 to handle cases like example.com
+            const mainDomain = domainParts.slice(-2).join('.');
+            uniqueDomains.add(mainDomain);
 
-            // Ajouter le domaine parent pour les sous-domaines
-            const domainParts = hostname.split('.');
-
-            // Traitement différent selon le nombre de parties
-            if (domainParts.length > 2) {
-              // Pour les sous-domaines (ex: sub.example.com)
-              const mainDomain = domainParts.slice(-2).join('.');
-              origins.add(`https://${mainDomain}`);
-              origins.add(`http://${mainDomain}`);
-
-              // Pour les cas comme co.uk, com.br, etc.
-              if (domainParts.length > 3 &&
-                ['co', 'com', 'org', 'net', 'gov', 'edu'].includes(domainParts[domainParts.length - 2])) {
-                const extendedDomain = domainParts.slice(-3).join('.');
-                origins.add(`https://${extendedDomain}`);
-                origins.add(`http://${extendedDomain}`);
-              }
+            // Gérer les TLDs à plusieurs niveaux (ex: co.uk)
+            if (domainParts.length > 2 && // Changed from > 3 to > 2
+              ['co', 'com', 'org', 'net', 'gov', 'edu'].includes(domainParts[domainParts.length - 2])) {
+              const extendedDomain = domainParts.slice(-3).join('.');
+              uniqueDomains.add(extendedDomain);
             }
           }
         } catch (e) {
@@ -78,9 +71,17 @@ const BookmarkManager = {
     // Traiter tous les nœuds racine
     nodes.forEach(processNode);
 
+    // Construire la liste finale des origines avec http:// et https://
+    const origins = new Set();
+    uniqueDomains.forEach(domain => {
+      origins.add(`https://${domain}`);
+      origins.add(`http://${domain}`);
+    });
+
     return {
       origins: Array.from(origins),
-      invalidUrls
+      invalidUrls,
+      uniqueDomainsCount: uniqueDomains.size
     };
   }
 };
@@ -610,9 +611,10 @@ async function loadAndDisplayStats() {
     try {
       // Récupérer le nombre actuel de sites favoris
       const {
-        origins
+        origins,
+        uniqueDomainsCount
       } = await BookmarkManager.getBookmarkOrigins();
-      bookmarksCount = origins.length;
+      bookmarksCount = uniqueDomainsCount;
     } catch (bookmarkError) {
       console.error(chrome.i18n.getMessage('errorFetchingBookmarks'), bookmarkError);
       UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [bookmarkError.message]), 'warning');

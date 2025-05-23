@@ -102,10 +102,26 @@ const CleaningService = {
       startTime,
       endTime,
       duration: new Date(endTime) - new Date(startTime),
-      excludedOrigins: {
-        count: excludedOrigins.length,
-        domains: excludedOrigins
-      },
+      excludedOrigins: (() => {
+        const uniqueDomains = new Set();
+        excludedOrigins.forEach(origin => {
+          try {
+            let hostname = new URL(origin).hostname;
+            // Supprimer 'www.' pour la déduplication dans le log
+            if (hostname.startsWith('www.')) {
+              hostname = hostname.substring(4);
+            }
+            uniqueDomains.add(hostname);
+          } catch (e) {
+            uniqueDomains.add(origin); // Fallback pour les URL invalides
+          }
+        });
+        const domainsArray = Array.from(uniqueDomains);
+        return {
+          count: domainsArray.length,
+          domains: domainsArray
+        };
+      })(),
       dataTypesRemoved: Object.keys(dataTypes).filter(key => dataTypes[key]),
       success: !error,
       error: error ? {
