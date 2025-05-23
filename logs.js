@@ -22,7 +22,7 @@ const LogDataManager = {
 
       return JSON.parse(decodeURIComponent(logParam));
     } catch (error) {
-      console.error('Erreur lors du parsing des données de log:', error);
+      console.error(chrome.i18n.getMessage('errorParsingLogData'), error);
       return null;
     }
   },
@@ -39,7 +39,7 @@ const LogDataManager = {
       const date = new Date(isoDate);
       return date.toLocaleString();
     } catch (error) {
-      console.error('Erreur lors du formatage de la date:', error);
+      console.error(chrome.i18n.getMessage('errorFormattingDate'), error);
       return isoDate;
     }
   },
@@ -53,13 +53,13 @@ const LogDataManager = {
     if (!ms && ms !== 0) return '-';
 
     if (ms < 1000) {
-      return `${ms} ms`;
+      return chrome.i18n.getMessage('millisecondsShort', [ms]);
     } else if (ms < 60000) {
-      return `${(ms / 1000).toFixed(2)} secondes`;
+      return chrome.i18n.getMessage('secondsShort', [(ms / 1000).toFixed(2)]);
     } else {
       const minutes = Math.floor(ms / 60000);
       const seconds = ((ms % 60000) / 1000).toFixed(1);
-      return `${minutes} min ${seconds} s`;
+      return chrome.i18n.getMessage('minutesSecondsShort', [minutes, seconds]);
     }
   }
 };
@@ -212,13 +212,13 @@ const LogUIManager = {
       .then(() => {
         // Retour visuel temporaire
         const originalText = this.elements.copyJsonBtn.textContent;
-        this.elements.copyJsonBtn.textContent = 'Copié !';
+        this.elements.copyJsonBtn.textContent = chrome.i18n.getMessage('copiedText');
         setTimeout(() => {
           this.elements.copyJsonBtn.textContent = originalText;
         }, 1500);
       })
       .catch(err => {
-        console.error('Erreur lors de la copie:', err);
+        console.error(chrome.i18n.getMessage('errorCopying'), err);
       });
   },
 
@@ -234,18 +234,18 @@ const LogUIManager = {
       try {
         const jsonData = JSON.parse(rawJson.textContent);
         rawJson.textContent = JSON.stringify(jsonData);
-        button.textContent = 'Formater';
+        button.textContent = chrome.i18n.getMessage('formatButtonText');
       } catch (error) {
-        console.error('Erreur lors du parsing JSON:', error);
+        console.error(chrome.i18n.getMessage('errorParsingJson'), error);
       }
     } else {
       // Passer au format formaté
       try {
         const jsonData = JSON.parse(rawJson.textContent);
         rawJson.textContent = JSON.stringify(jsonData, null, 2);
-        button.textContent = 'Compacter';
+        button.textContent = chrome.i18n.getMessage('compactButtonText');
       } catch (error) {
-        console.error('Erreur lors du parsing JSON:', error);
+        console.error(chrome.i18n.getMessage('errorParsingJson'), error);
       }
     }
 
@@ -279,7 +279,7 @@ const LogUIManager = {
 
     // Status
     if (this.elements.statusValue) {
-      this.elements.statusValue.textContent = logData.success ? 'Réussi' : 'Échec';
+      this.elements.statusValue.textContent = logData.success ? chrome.i18n.getMessage('statusSuccess') : chrome.i18n.getMessage('statusFailure');
       this.elements.statusValue.className = 'summary-value ' + (logData.success ? 'success' : 'error');
     }
 
@@ -311,12 +311,12 @@ const LogUIManager = {
 
     // Données de l'opération
     const details = [
-      { label: 'Opération', value: logData.operation || 'Nettoyage des données de navigation' },
-      { label: 'Heure de début', value: LogDataManager.formatDate(logData.startTime) },
-      { label: 'Heure de fin', value: LogDataManager.formatDate(logData.endTime) },
-      { label: 'Durée', value: LogDataManager.formatDuration(logData.duration) },
-      { label: 'Sites préservés', value: logData.excludedOrigins?.count || 0 },
-      { label: 'Types de données nettoyés', value: (logData.dataTypesRemoved || []).join(', ') }
+      { label: chrome.i18n.getMessage('operationLabel'), value: logData.operation || chrome.i18n.getMessage('cleanupOperation') },
+      { label: chrome.i18n.getMessage('startTimeLabel'), value: LogDataManager.formatDate(logData.startTime) },
+      { label: chrome.i18n.getMessage('endTimeLabel'), value: LogDataManager.formatDate(logData.endTime) },
+      { label: chrome.i18n.getMessage('durationLabel'), value: LogDataManager.formatDuration(logData.duration) },
+      { label: chrome.i18n.getMessage('preservedSitesLabel'), value: logData.excludedOrigins?.count || 0 },
+      { label: chrome.i18n.getMessage('dataTypesCleanedLabel'), value: (logData.dataTypesRemoved || []).join(', ') }
     ];
 
     // Ajouter chaque ligne à la table
@@ -341,7 +341,7 @@ const LogUIManager = {
       this.elements.errorSection.style.display = 'block';
 
       if (this.elements.errorMessage) {
-        this.elements.errorMessage.textContent = logData.error.message || 'Une erreur est survenue';
+        this.elements.errorMessage.textContent = logData.error.message || chrome.i18n.getMessage('anErrorOccurred');
       }
 
       if (this.elements.errorStack && logData.error.stack) {
@@ -367,7 +367,7 @@ const LogUIManager = {
     if (domains.length === 0) {
       const message = document.createElement('p');
       message.className = 'no-domains';
-      message.textContent = 'Aucun domaine préservé';
+      message.textContent = chrome.i18n.getMessage('noDomainsPreserved');
       this.elements.domainsList.appendChild(message);
       return;
     }
@@ -438,9 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Afficher un message d'erreur
     document.body.innerHTML = `
       <div class="container error-container">
-        <h1>Erreur</h1>
-        <p>Impossible de charger les données de log.</p>
-        <button class="btn btn-primary" onclick="window.close()">Fermer</button>
+        <h1>${chrome.i18n.getMessage('errorTitle')}</h1>
+        <p>${chrome.i18n.getMessage('errorLoadingLogData')}</p>
+        <button class="btn btn-primary" onclick="window.close()">${chrome.i18n.getMessage('closeButtonText')}</button>
       </div>
     `;
   }

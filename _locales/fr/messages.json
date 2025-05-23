@@ -155,5 +155,144 @@
   "statusResetSuccess": {
     "message": "Paramètres réinitialisés avec succès",
     "description": "Message de succès après réinitialisation des paramètres"
+  },
+  "essentialElementNotFound": {
+    "message": "Élément essentiel non trouvé: $1"
+  },
+  "checkboxNotFound": {
+    "message": "Case à cocher non trouvée pour le type de données: $1"
+  },
+  "checkboxNotAvailable": {
+    "message": "Case à cocher non disponible pour le type: $1"
+  },
+  "settingsPanelNotAvailable": {
+    "message": "Panneau de paramètres non disponible pour le basculement de visibilité"
+  },
+  "errorSavingAdvancedSettings": {
+    "message": "Erreur lors de l'enregistrement de l'état des paramètres avancés:"
+  },
+  "invalidTimestampSaveAttempt": {
+    "message": "Tentative de sauvegarde d'un horodatage invalide"
+  },
+  "errorSavingCleanTime": {
+    "message": "Erreur lors de la sauvegarde de l'heure de nettoyage:"
+  },
+  "dateFormattingError": {
+    "message": "Erreur de formatage de date:"
+  },
+  "statusMessageElementNotAvailable": {
+    "message": "Élément de message de statut non disponible"
+  },
+  "errorRetrievingDataTypes": {
+    "message": "Erreur lors de la récupération des types de données:"
+  },
+  "errorSavingSettings": {
+    "message": "Erreur lors de la sauvegarde des paramètres:"
+  },
+  "uiInitializationComplete": {
+    "message": "Initialisation de l'interface utilisateur terminée"
+  },
+  "uiInitializationError": {
+    "message": "Erreur lors de l'initialisation de l'interface:"
+  },
+  "errorResettingSettings": {
+    "message": "Erreur lors de la réinitialisation des paramètres:"
+  },
+  "errorFetchingBookmarks": {
+    "message": "Erreur lors de la récupération des favoris:"
+  },
+  "cannotAccessBookmarks": {
+    "message": "Impossible d'accéder aux favoris: $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "invalidBookmarkUrl": {
+    "message": "URL de favori invalide:"
+  },
+  "statusPortDisconnectedErrorDetail": {
+    "message": "La connexion avec le service de nettoyage a été interrompue : $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "statusPortDisconnectedError": {
+    "message": "La connexion avec le service de nettoyage a été interrompue."
+  },
+  "errorParsingLogData": {
+    "message": "Erreur lors du parsing des données de log:"
+  },
+  "errorFormattingDate": {
+    "message": "Erreur lors du formatage de la date:"
+  },
+  "millisecondsShort": {
+    "message": "$1 ms"
+  },
+  "secondsShort": {
+    "message": "$1 secondes"
+  },
+  "minutesSecondsShort": {
+    "message": "$1 min $2 s"
+  },
+  "copiedText": {
+    "message": "Copié !"
+  },
+  "errorCopying": {
+    "message": "Erreur lors de la copie:"
+  },
+  "formatButtonText": {
+    "message": "Formater"
+  },
+  "compactButtonText": {
+    "message": "Compacter"
+  },
+  "errorParsingJson": {
+    "message": "Erreur lors du parsing JSON:"
+  },
+  "statusSuccess": {
+    "message": "Réussi"
+  },
+  "statusFailure": {
+    "message": "Échec"
+  },
+  "operationLabel": {
+    "message": "Opération"
+  },
+  "cleanupOperation": {
+    "message": "Nettoyage des données de navigation"
+  },
+  "startTimeLabel": {
+    "message": "Heure de début"
+  },
+  "endTimeLabel": {
+    "message": "Heure de fin"
+  },
+  "durationLabel": {
+    "message": "Durée"
+  },
+  "preservedSitesLabel": {
+    "message": "Sites préservés"
+  },
+  "dataTypesCleanedLabel": {
+    "message": "Types de données nettoyés"
+  },
+  "anErrorOccurred": {
+    "message": "Une erreur est survenue"
+  },
+  "noDomainsPreserved": {
+    "message": "Aucun domaine préservé"
+  },
+  "errorTitle": {
+    "message": "Erreur"
+  },
+  "errorLoadingLogData": {
+    "message": "Impossible de charger les données de log."
+  },
+  "closeButtonText": {
+    "message": "Fermer"
   }
 }

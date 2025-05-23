@@ -117,7 +117,7 @@ const UIManager = {
     const essentialElements = ['cleanButton', 'statusMessage', 'results'];
     for (const elemId of essentialElements) {
       if (!this.elements[elemId]) {
-        console.error(`Élément essentiel non trouvé: ${elemId}`);
+        console.error(chrome.i18n.getMessage('essentialElementNotFound', [elemId]));
       }
     }
 
@@ -127,7 +127,7 @@ const UIManager = {
       const checkbox = document.getElementById(`${type}Checkbox`);
       this.elements.dataTypeCheckboxes[type] = checkbox;
       if (!checkbox) {
-        console.warn(`Case à cocher non trouvée pour le type de données: ${type}`);
+        console.warn(chrome.i18n.getMessage('checkboxNotFound', [type]));
       }
     });
   },
@@ -165,7 +165,7 @@ const UIManager = {
         if (this.elements.dataTypeCheckboxes[type]) {
           this.elements.dataTypeCheckboxes[type].checked = checked;
         } else {
-          console.warn(`Case à cocher non disponible pour le type: ${type}`);
+          console.warn(chrome.i18n.getMessage('checkboxNotAvailable', [type]));
         }
       });
       
@@ -185,7 +185,7 @@ const UIManager = {
     if (this.elements.settingsPanel) {
       this.elements.settingsPanel.style.display = visible ? 'block' : 'none';
     } else {
-      console.warn('Panneau de paramètres non disponible pour le basculement de visibilité');
+      console.warn(chrome.i18n.getMessage('settingsPanelNotAvailable'));
       return;
     }
 
@@ -194,7 +194,7 @@ const UIManager = {
         advancedSettingsVisible: visible
       });
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de l\'état des paramètres avancés:', error);
+      console.error(chrome.i18n.getMessage('errorSavingAdvancedSettings'), error);
     }
   },
 
@@ -205,7 +205,7 @@ const UIManager = {
    */
   async saveLastCleanedTime(timeString) {
     if (!timeString) {
-      console.warn('Tentative de sauvegarde d\'un horodatage invalide');
+      console.warn(chrome.i18n.getMessage('invalidTimestampSaveAttempt'));
       return;
     }
     
@@ -214,7 +214,7 @@ const UIManager = {
         lastCleanedTime: timeString
       });
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de l\'heure de nettoyage:', error);
+      console.error(chrome.i18n.getMessage('errorSavingCleanTime'), error);
     }
   },
 
@@ -255,8 +255,8 @@ const UIManager = {
           });
           this.elements.lastCleanedTime.innerText = `${formattedDate} ${formattedTime}`;
         } catch (e) {
-          console.error('Erreur de formatage de date:', lastCleanedTime, e);
-          this.elements.lastCleanedTime.innerText = chrome.i18n.getMessage('invalidDateFormat') || 'Date invalide';
+          console.error(chrome.i18n.getMessage('dateFormattingError'), lastCleanedTime, e);
+          this.elements.lastCleanedTime.innerText = chrome.i18n.getMessage('invalidDateFormat');
         }
       } else {
         this.elements.lastCleanedTime.innerText = '-';
@@ -271,7 +271,7 @@ const UIManager = {
    */
   setStatus(message, type = 'info') {
     if (!this.elements.statusMessage) {
-      console.warn('Élément de message de statut non disponible');
+      console.warn(chrome.i18n.getMessage('statusMessageElementNotAvailable'));
       return;
     }
 
@@ -365,7 +365,7 @@ const UIManager = {
         }
       });
     } catch (error) {
-      console.error('Erreur lors de la récupération des types de données:', error);
+      console.error(chrome.i18n.getMessage('errorRetrievingDataTypes'), error);
       // Retourne les valeurs par défaut en cas d'erreur
     }
 
@@ -388,7 +388,7 @@ const UIManager = {
       
       return true;
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde des paramètres:', error);
+      console.error(chrome.i18n.getMessage('errorSavingSettings'), error);
       this.setStatus(chrome.i18n.getMessage('errorLoadingSettings'), 'error');
       return false;
     }
@@ -561,15 +561,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Ajouter l'événement pour le bouton de réinitialisation
     if (UIManager.elements.resetButton) {
       UIManager.elements.resetButton.addEventListener('click', async () => {
-        if (confirm(chrome.i18n.getMessage('confirmReset') || 'Êtes-vous sûr de vouloir réinitialiser tous les paramètres?')) {
+        if (confirm(chrome.i18n.getMessage('confirmReset'))) {
           await resetAllSettings();
         }
       });
     }
     
-    console.info('Initialisation de l\'interface utilisateur terminée');
+    console.info(chrome.i18n.getMessage('uiInitializationComplete'));
   } catch (error) {
-    console.error('Erreur lors de l\'initialisation de l\'interface:', error);
+    console.error(chrome.i18n.getMessage('uiInitializationError'), error);
     UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
   }
 });
@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function resetAllSettings() {
   try {
     await chrome.storage.sync.clear();
-    UIManager.setStatus(chrome.i18n.getMessage('statusResetSuccess') || 'Paramètres réinitialisés avec succès', 'success');
+    UIManager.setStatus(chrome.i18n.getMessage('statusResetSuccess'), 'success');
     
     // Recharger les paramètres par défaut
     await UIManager.loadSavedState();
@@ -588,7 +588,7 @@ async function resetAllSettings() {
     
     return true;
   } catch (error) {
-    console.error('Erreur lors de la réinitialisation des paramètres:', error);
+    console.error(chrome.i18n.getMessage('errorResettingSettings'), error);
     UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
     return false;
   }
@@ -614,7 +614,7 @@ async function loadAndDisplayStats() {
       } = await BookmarkManager.getBookmarkOrigins();
       bookmarksCount = origins.length;
     } catch (bookmarkError) {
-      console.error('Erreur lors de la récupération des favoris:', bookmarkError);
+      console.error(chrome.i18n.getMessage('errorFetchingBookmarks'), bookmarkError);
       UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [bookmarkError.message]), 'warning');
       bookmarksCount = -1;
     }

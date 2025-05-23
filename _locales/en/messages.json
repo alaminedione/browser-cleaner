@@ -134,5 +134,144 @@
   "statusResetSuccess": {
     "message": "Settings successfully reset",
     "description": "Success message after settings reset"
+  },
+  "essentialElementNotFound": {
+    "message": "Essential element not found: $1"
+  },
+  "checkboxNotFound": {
+    "message": "Checkbox not found for data type: $1"
+  },
+  "checkboxNotAvailable": {
+    "message": "Checkbox not available for type: $1"
+  },
+  "settingsPanelNotAvailable": {
+    "message": "Settings panel not available for visibility toggle"
+  },
+  "errorSavingAdvancedSettings": {
+    "message": "Error saving advanced settings state:"
+  },
+  "invalidTimestampSaveAttempt": {
+    "message": "Attempt to save invalid timestamp"
+  },
+  "errorSavingCleanTime": {
+    "message": "Error saving clean time:"
+  },
+  "dateFormattingError": {
+    "message": "Date formatting error:"
+  },
+  "statusMessageElementNotAvailable": {
+    "message": "Status message element not available"
+  },
+  "errorRetrievingDataTypes": {
+    "message": "Error retrieving data types:"
+  },
+  "errorSavingSettings": {
+    "message": "Error saving settings:"
+  },
+  "uiInitializationComplete": {
+    "message": "UI initialization complete"
+  },
+  "uiInitializationError": {
+    "message": "Error during UI initialization:"
+  },
+  "errorResettingSettings": {
+    "message": "Error resetting settings:"
+  },
+  "errorFetchingBookmarks": {
+    "message": "Error fetching bookmarks:"
+  },
+  "cannotAccessBookmarks": {
+    "message": "Cannot access bookmarks: $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "invalidBookmarkUrl": {
+    "message": "Invalid bookmark URL:"
+  },
+  "statusPortDisconnectedErrorDetail": {
+    "message": "Connection to cleaning service was interrupted: $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "statusPortDisconnectedError": {
+    "message": "Connection to cleaning service was interrupted."
+  },
+  "errorParsingLogData": {
+    "message": "Error parsing log data:"
+  },
+  "errorFormattingDate": {
+    "message": "Error formatting date:"
+  },
+  "millisecondsShort": {
+    "message": "$1 ms"
+  },
+  "secondsShort": {
+    "message": "$1 seconds"
+  },
+  "minutesSecondsShort": {
+    "message": "$1 min $2 s"
+  },
+  "copiedText": {
+    "message": "Copied!"
+  },
+  "errorCopying": {
+    "message": "Error copying:"
+  },
+  "formatButtonText": {
+    "message": "Format"
+  },
+  "compactButtonText": {
+    "message": "Compact"
+  },
+  "errorParsingJson": {
+    "message": "Error parsing JSON:"
+  },
+  "statusSuccess": {
+    "message": "Success"
+  },
+  "statusFailure": {
+    "message": "Failure"
+  },
+  "operationLabel": {
+    "message": "Operation"
+  },
+  "cleanupOperation": {
+    "message": "Browsing Data Cleanup"
+  },
+  "startTimeLabel": {
+    "message": "Start Time"
+  },
+  "endTimeLabel": {
+    "message": "End Time"
+  },
+  "durationLabel": {
+    "message": "Duration"
+  },
+  "preservedSitesLabel": {
+    "message": "Preserved Sites"
+  },
+  "dataTypesCleanedLabel": {
+    "message": "Data Types Cleaned"
+  },
+  "anErrorOccurred": {
+    "message": "An error occurred"
+  },
+  "noDomainsPreserved": {
+    "message": "No domains preserved"
+  },
+  "errorTitle": {
+    "message": "Error"
+  },
+  "errorLoadingLogData": {
+    "message": "Unable to load log data."
+  },
+  "closeButtonText": {
+    "message": "Close"
   }
 }
