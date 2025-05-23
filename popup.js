@@ -500,10 +500,29 @@ const CleaningManager = {
 };
 
 /**
+ * Remplace les placeholders __MSG_...__ par les messages localisés.
+ */
+function localizeHtml() {
+  const elements = document.querySelectorAll('[data-i18n]');
+  elements.forEach(element => {
+    const messageKey = element.dataset.i18n;
+    if (messageKey) {
+      element.textContent = chrome.i18n.getMessage(messageKey);
+    }
+  });
+
+  // Cas spécifiques pour les attributs ou le titre de la page
+  document.title = chrome.i18n.getMessage('popupTitle');
+}
+
+/**
  * Initialise l'application lorsque le DOM est chargé
  */
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    // Localiser le HTML
+    localizeHtml();
+
     // Initialiser l'interface utilisateur
     UIManager.initElements();
     await UIManager.loadSavedState();
