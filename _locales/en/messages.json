@@ -127,6 +127,31 @@
     "message": "Attempting with default parameters...",
     "description": "Message when retrying after an error"
   },
+  "notification_cleaning_started": {
+    "message": "Cleaning in progress..."
+  },
+  "notification_cleaning_success_title": {
+    "message": "Cleaning Successful"
+  },
+  "notification_cleaning_success_detail": {
+    "message": "Your browsing data has been successfully cleaned! ($1 bookmarked sites preserved)",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
+  "notification_cleaning_failed_title": {
+    "message": "Cleaning Failed"
+  },
+  "notification_cleaning_failed_detail": {
+    "message": "An error occurred: $1",
+    "placeholders": {
+      "1": {
+        "content": "%s"
+      }
+    }
+  },
   "confirmReset": {
     "message": "Are you sure you want to reset all settings?",
     "description": "Confirmation message when resetting settings"

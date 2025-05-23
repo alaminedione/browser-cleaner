@@ -319,6 +319,8 @@ const LogUIManager = {
       { label: chrome.i18n.getMessage('dataTypesCleanedLabel'), value: (logData.dataTypesRemoved || []).map(type => chrome.i18n.getMessage(type + 'Label')).join(', ') }
     ];
 
+    console.log("Détails des logs:", details); // Ajout du log pour le débogage
+
     // ${chrome.i18n.getMessage('addRowToTableComment')}
     details.forEach(detail => {
       const row = document.createElement('tr');

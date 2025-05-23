@@ -2,6 +2,9 @@
   "extName": {
     "message": "Nettoyage de Navigation"
   },
+  "extDescription": {
+    "message": "Supprime toutes les données à l'exception des sites favoris"
+  },
   "popupTitle": {
     "message": "Nettoyage de Navigation"
   },
