@@ -57,11 +57,11 @@ const Utils = {
         title: title || '',
         message: message || ''
       });
-      Utils.logger.debug(`Notification created: ${type}`, { title, message });
+      Utils.logger.debug(chrome.i18n.getMessage('notificationCreated', [type]), { title, message });
     } catch (error) {
       // Si l'affichage de notification échoue, on log l'erreur mais on continue
-      Utils.logger.error('Failed to show notification', error);
-      console.error('Notification error:', error);
+      Utils.logger.error(chrome.i18n.getMessage('failedToShowNotification'), error);
+      console.error(chrome.i18n.getMessage('notificationError'), error);
       // Réessayer avec uniquement l'icône par défaut en cas d'échec
       try {
         await chrome.notifications.create({
@@ -72,7 +72,7 @@ const Utils = {
         });
       } catch (fallbackError) {
         // Si même la notification de secours échoue, on continue silencieusement
-        Utils.logger.error('Failed to show fallback notification', fallbackError);
+        Utils.logger.error(chrome.i18n.getMessage('failedToShowFallbackNotification'), fallbackError);
       }
     }
   }
@@ -89,7 +89,7 @@ const CleaningService = {
         ''
       );
     } catch (error) {
-      Utils.logger.warn('Failed to show progress notification', error);
+      Utils.logger.warn(chrome.i18n.getMessage('failedToShowProgressNotification'), error);
       // Continue le processus même si la notification échoue
     }
   },
@@ -114,7 +114,7 @@ const CleaningService = {
       } : null
     };
 
-    Utils.logger.info('Cleaning operation completed', logDetails);
+    Utils.logger.info(chrome.i18n.getMessage('cleaningOperationCompleted'), logDetails);
 
     if (error) {
       try {
@@ -124,9 +124,14 @@ const CleaningService = {
           chrome.i18n.getMessage('notification_cleaning_failed_detail', [error.message])
         );
       } catch (notifError) {
-        Utils.logger.error('Failed to show error notification', notifError);
+        Utils.logger.error(chrome.i18n.getMessage('failedToShowErrorNotification'), notifError);
       }
-      port.postMessage({ status: "error", message: error.message, log: logDetails });
+      // Vérifier si le port est toujours connecté avant d'envoyer le message
+      if (!port.disconnected) {
+        port.postMessage({ status: "error", message: error.message, log: logDetails });
+      } else {
+        Utils.logger.warn(chrome.i18n.getMessage('portDisconnectedWarning'), { status: "error", message: error.message, log: logDetails });
+      }
     } else {
       try {
         await Utils.showNotification(
@@ -135,9 +140,14 @@ const CleaningService = {
           chrome.i18n.getMessage('notification_cleaning_success_detail', [excludedOrigins.length])
         );
       } catch (notifError) {
-        Utils.logger.error('Failed to show success notification', notifError);
+        Utils.logger.error(chrome.i18n.getMessage('failedToShowSuccessNotification'), notifError);
       }
-      port.postMessage({ status: "done", log: logDetails });
+      // Vérifier si le port est toujours connecté avant d'envoyer le message
+      if (!port.disconnected) {
+        port.postMessage({ status: "done", log: logDetails });
+      } else {
+        Utils.logger.warn(chrome.i18n.getMessage('portDisconnectedWarning'), { status: "done", log: logDetails });
+      }
     }
   },
 
@@ -150,7 +160,7 @@ const CleaningService = {
       // Afficher une notification de progression
       await this.showProgressNotification();
 
-      Utils.logger.info('Starting browsing data cleanup', {
+      Utils.logger.info(chrome.i18n.getMessage('startingBrowsingDataCleanup'), {
         excludedOrigins: origins.length,
         dataTypes
       });
@@ -158,7 +168,7 @@ const CleaningService = {
       // Valider les origines exclues
       const validOrigins = origins.filter(origin => {
         const isValid = typeof origin === 'string' && origin.trim().length > 0;
-        if (!isValid) Utils.logger.warn(`Invalid origin excluded: ${origin}`);
+        if (!isValid) Utils.logger.warn(chrome.i18n.getMessage('invalidOriginExcluded', [origin]));
         return isValid;
       });
 
@@ -179,7 +189,7 @@ const CleaningService = {
       // Traiter le résultat
       this.handleCleaningResult(port, startTime, validOrigins, dataTypes);
     } catch (error) {
-      Utils.logger.error('Error during browsing data cleanup', error);
+      Utils.logger.error(chrome.i18n.getMessage('errorDuringBrowsingDataCleanup'), error);
       this.handleCleaningResult(port, startTime, origins, dataTypes, error);
     }
   }
@@ -191,11 +201,11 @@ function initBrowserCleaner() {
   chrome.runtime.onConnect.addListener((port) => {
     if (port.name !== "clean-port") return;
 
-    Utils.logger.info('Connected to cleanup port');
+    Utils.logger.info(chrome.i18n.getMessage('connectedToCleanupPort'));
 
     // Écouter les messages sur ce port
     port.onMessage.addListener((message) => {
-      Utils.logger.debug('Received message on cleanup port', message);
+      Utils.logger.debug(chrome.i18n.getMessage('receivedMessageOnCleanupPort'), message);
 
       const { action, origins = [], dataTypes } = message;
 
@@ -214,14 +224,14 @@ function initBrowserCleaner() {
 
     // Gérer la déconnexion
     port.onDisconnect.addListener(() => {
-      Utils.logger.info('Cleanup port disconnected');
+      Utils.logger.info(chrome.i18n.getMessage('cleanupPortDisconnected'));
       if (chrome.runtime.lastError) {
-        Utils.logger.error('Port error:', chrome.runtime.lastError);
+        Utils.logger.error(chrome.i18n.getMessage('portError'), chrome.runtime.lastError);
       }
     });
   });
 
-  Utils.logger.info('Browser cleaner initialized');
+  Utils.logger.info(chrome.i18n.getMessage('browserCleanerInitialized'));
 }
 
 // Démarrer le service

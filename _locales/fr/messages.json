@@ -294,5 +294,56 @@
   },
   "closeButtonText": {
     "message": "Fermer"
+  },
+  "notificationCreated": {
+    "message": "Notification créée: $1"
+  },
+  "failedToShowNotification": {
+    "message": "Échec de l'affichage de la notification"
+  },
+  "notificationError": {
+    "message": "Erreur de notification:"
+  },
+  "failedToShowFallbackNotification": {
+    "message": "Échec de l'affichage de la notification de secours"
+  },
+  "failedToShowProgressNotification": {
+    "message": "Échec de l'affichage de la notification de progression"
+  },
+  "cleaningOperationCompleted": {
+    "message": "Opération de nettoyage terminée"
+  },
+  "failedToShowErrorNotification": {
+    "message": "Échec de l'affichage de la notification d'erreur"
+  },
+  "failedToShowSuccessNotification": {
+    "message": "Échec de l'affichage de la notification de succès"
+  },
+  "startingBrowsingDataCleanup": {
+    "message": "Démarrage du nettoyage des données de navigation"
+  },
+  "invalidOriginExcluded": {
+    "message": "Origine invalide exclue: $1"
+  },
+  "errorDuringBrowsingDataCleanup": {
+    "message": "Erreur lors du nettoyage des données de navigation"
+  },
+  "connectedToCleanupPort": {
+    "message": "Connecté au port de nettoyage"
+  },
+  "receivedMessageOnCleanupPort": {
+    "message": "Message reçu sur le port de nettoyage"
+  },
+  "cleanupPortDisconnected": {
+    "message": "Port de nettoyage déconnecté"
+  },
+  "portError": {
+    "message": "Erreur de port:"
+  },
+  "browserCleanerInitialized": {
+    "message": "Nettoyeur de navigateur initialisé"
+  },
+  "portDisconnectedWarning": {
+    "message": "Tentative d'envoi de message sur un port déconnecté."
   }
 }

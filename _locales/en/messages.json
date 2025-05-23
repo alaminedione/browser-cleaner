@@ -273,5 +273,56 @@
   },
   "closeButtonText": {
     "message": "Close"
+  },
+  "notificationCreated": {
+    "message": "Notification created: $1"
+  },
+  "failedToShowNotification": {
+    "message": "Failed to show notification"
+  },
+  "notificationError": {
+    "message": "Notification error:"
+  },
+  "failedToShowFallbackNotification": {
+    "message": "Failed to show fallback notification"
+  },
+  "failedToShowProgressNotification": {
+    "message": "Failed to show progress notification"
+  },
+  "cleaningOperationCompleted": {
+    "message": "Cleaning operation completed"
+  },
+  "failedToShowErrorNotification": {
+    "message": "Failed to show error notification"
+  },
+  "failedToShowSuccessNotification": {
+    "message": "Failed to show success notification"
+  },
+  "startingBrowsingDataCleanup": {
+    "message": "Starting browsing data cleanup"
+  },
+  "invalidOriginExcluded": {
+    "message": "Invalid origin excluded: $1"
+  },
+  "errorDuringBrowsingDataCleanup": {
+    "message": "Error during browsing data cleanup"
+  },
+  "connectedToCleanupPort": {
+    "message": "Connected to cleanup port"
+  },
+  "receivedMessageOnCleanupPort": {
+    "message": "Received message on cleanup port"
+  },
+  "cleanupPortDisconnected": {
+    "message": "Cleanup port disconnected"
+  },
+  "portError": {
+    "message": "Port error:"
+  },
+  "browserCleanerInitialized": {
+    "message": "Browser cleaner initialized"
+  },
+  "portDisconnectedWarning": {
+    "message": "Attempting to send message on a disconnected port."
   }
 }
