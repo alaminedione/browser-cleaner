@@ -79,6 +79,10 @@
     "message": "Cleaning in progress...",
     "description": "Status message when cleaning starts"
   },
+  "statusCleaningStartingWithDelay": {
+    "message": "Cleaning in 2 seconds, this may take some time",
+    "description": "Status message when cleaning is about to start with a delay"
+  },
   "statusInvalidUrlsFound": {
     "message": "Warning: $1 invalid URL(s) found in bookmarks:",
     "description": "Warning message when invalid URLs are found. $1 is the count."

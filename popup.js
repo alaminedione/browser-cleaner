@@ -404,15 +404,15 @@ const CleaningManager = {
    * Exécute le processus de nettoyage
    */
    async executeCleanup() {
-     UIManager.setStatus(chrome.i18n.getMessage('statusCleaningInProgress'), 'info');
+     UIManager.setStatus(chrome.i18n.getMessage('statusCleaningStartingWithDelay'), 'info');
      UIManager.setCleanButtonEnabled(false);
  
      try {
-      // Récupérer les origines des favoris
-      const {
-        origins,
-        invalidUrls
-      } = await BookmarkManager.getBookmarkOrigins();
+       // Récupérer les origines des favoris
+       const {
+         origins,
+         invalidUrls
+       } = await BookmarkManager.getBookmarkOrigins();
 
       // Afficher les URL invalides si nécessaire (maintenant via setStatus)
       if (invalidUrls.length > 0) {

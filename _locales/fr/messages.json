@@ -59,6 +59,9 @@
   "statusCleaningInProgress": {
     "message": "Nettoyage en cours..."
   },
+  "statusCleaningStartingWithDelay": {
+    "message": "Nettoyage dans 2 secondes, cela peut prendre du temps"
+  },
   "statusInvalidUrlsFound": {
     "message": "Attention : $1 URL(s) invalide(s) trouvée(s) dans les favoris :",
     "placeholders": {
