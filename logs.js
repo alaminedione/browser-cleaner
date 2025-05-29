@@ -11,16 +11,13 @@ const LogDataManager = {
    * Parse les données de log depuis l'URL
    * @returns {Object|null} Données de log ou null en cas d'erreur
    */
-  parseLogData() {
+  async parseLogData() {
     try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const logParam = urlParams.get('log');
-
-      if (!logParam) {
+      const result = await chrome.storage.local.get(['lastLog']);
+      if (!result.lastLog) {
         throw new Error(chrome.i18n.getMessage('noLogDataFoundInUrl'));
       }
-
-      return JSON.parse(decodeURIComponent(logParam));
+      return result.lastLog;
     } catch (error) {
       console.error(chrome.i18n.getMessage('errorParsingLogData'), error);
       return null;
@@ -421,13 +418,13 @@ const LogUIManager = {
 /**
  * ${chrome.i18n.getMessage('mainEntryPointTitle')}
  */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // ${chrome.i18n.getMessage('initializeUIComment')}
   LogUIManager.initElements();
   LogUIManager.setupEventListeners();
 
   // ${chrome.i18n.getMessage('retrieveAndProcessLogDataComment')}
-  const logData = LogDataManager.parseLogData();
+  const logData = await LogDataManager.parseLogData();
   LogDataManager.logData = logData;
 
   if (logData) {

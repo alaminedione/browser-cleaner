@@ -173,7 +173,7 @@ const CleaningService = {
       // Ouvrir les logs si l'option est activée, même si le popup est fermé
       if (showLogs) {
         Utils.logger.debug('Tentative d\'ouverture de logs.html avec logDetails:', logDetails);
-        await chrome.tabs.create({ url: chrome.runtime.getURL('logs.html?log=' + encodeURIComponent(JSON.stringify(logDetails))) });
+        await chrome.tabs.create({ url: chrome.runtime.getURL('logs.html') });
       }
     } catch (e) {
       Utils.logger.error('Erreur lors de l\'ouverture des logs', e);
@@ -184,11 +184,14 @@ const CleaningService = {
   async executeCleanup(options) {
     const { origins = [], dataTypes = CONFIG.defaultDataTypes } = options;
     const startTime = new Date().toISOString();
-
+ 
     try {
       // Afficher une notification de progression
       await this.showProgressNotification();
-
+ 
+      // Ajouter un délai de 2 secondes avant de démarrer l'opération réelle
+      await new Promise(resolve => setTimeout(resolve, 2000));
+ 
       Utils.logger.info(chrome.i18n.getMessage('startingBrowsingDataCleanup'), {
         excludedOrigins: origins.length,
         dataTypes
@@ -233,11 +236,13 @@ function initBrowserCleaner() {
     const { action, origins = [], dataTypes } = message;
 
     if (action === "clean") {
-      CleaningService.executeCleanup({
-        origins,
-        dataTypes: dataTypes || CONFIG.defaultDataTypes
-      });
-      sendResponse({ status: "started" }); // Répondre immédiatement que le nettoyage a commencé
+      (async () => {
+        await CleaningService.executeCleanup({
+          origins,
+          dataTypes: dataTypes || CONFIG.defaultDataTypes
+        });
+        sendResponse({ status: "completed" }); // Répondre une fois le nettoyage terminé
+      })();
       return true; // Indiquer que la réponse sera asynchrone
     } else if (action === "getConfig") {
       sendResponse({

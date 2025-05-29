@@ -406,10 +406,7 @@ const CleaningManager = {
    async executeCleanup() {
      UIManager.setStatus(chrome.i18n.getMessage('statusCleaningInProgress'), 'info');
      UIManager.setCleanButtonEnabled(false);
-
-     // Ajouter un délai de 2 secondes avant de démarrer l'opération
-     await new Promise(resolve => setTimeout(resolve, 2000));
-
+ 
      try {
       // Récupérer les origines des favoris
       const {
