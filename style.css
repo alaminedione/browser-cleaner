@@ -161,12 +161,66 @@ button {
   color: var(--error-color);
 }
 
-/* Paramètres */
-.settings {
+/* Onglets */
+.tabs {
+  display: flex;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-btn {
+  border: none;
+  background: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--light-text);
+  position: relative;
+  transition: color var(--transition);
+}
+
+.tab-btn:hover {
+  color: var(--text-color);
+}
+
+.tab-btn.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-btn.active::after {
+  content: '';
+  display: block;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color);
+}
+
+.tab-content-container {
+  margin-bottom: 16px;
+}
+
+.tab-content {
+  display: none;
   background-color: var(--secondary-color);
   border-radius: var(--radius);
   padding: 12px;
-  margin-bottom: 16px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Paramètres */
+.settings {
+  /* background-color: var(--secondary-color); */
+  border-radius: var(--radius);
+  /* padding: 12px; */
+  margin-bottom: 0; /* Supprimer le margin-bottom car il est géré par tab-content-container */
 }
 
 .settings-section {
@@ -250,10 +304,10 @@ input[type="checkbox"]:checked::before {
 
 /* Stats panel */
 .stats-panel {
-  background-color: var(--stats-bg);
+  /* background-color: var(--stats-bg); */
   border-radius: var(--radius);
-  padding: 12px;
-  margin-bottom: 16px;
+  /* padding: 12px; */
+  margin-bottom: 0; /* Supprimer le margin-bottom car il est géré par tab-content-container */
 }
 
 .stats-grid {

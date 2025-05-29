@@ -28,7 +28,14 @@
       <div id="statusMessage" class="status"></div>
     </div>
 
-    <!-- Paramètres -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="settings" data-i18n="settingsTab"></button>
+  <button class="tab-btn" data-tab="stats" data-i18n="statsTab"></button>
+</div>
+
+<div class="tab-content-container">
+  <!-- Contenu de l'onglet Paramètres -->
+  <div class="tab-content active" id="settings">
     <div class="settings">
       <div class="settings-header">
         <label class="toggle-container" for="advancedSettingsToggle">
@@ -72,8 +79,10 @@
         </label>
       </div>
     </div>
+  </div>
 
-    <!-- Statistiques -->
+  <!-- Contenu de l'onglet Statistiques -->
+  <div class="tab-content" id="stats">
     <div class="stats-panel">
       <h2 data-i18n="statsHeader"></h2>
       <div class="stats-grid">
@@ -87,6 +96,8 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- Résultats -->
     <div id="results" class="results-container"></div>

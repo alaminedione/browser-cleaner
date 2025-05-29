@@ -15,6 +15,14 @@
     "message": "Clean Now",
     "description": "Text on the main clean button"
   },
+  "settingsTab": {
+    "message": "Settings",
+    "description": "Label for the settings tab"
+  },
+  "statsTab": {
+    "message": "Statistics",
+    "description": "Label for the statistics tab"
+  },
   "advancedSettingsToggleLabel": {
     "message": "Advanced Settings",
     "description": "Label for the advanced settings toggle"

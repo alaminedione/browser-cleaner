@@ -11,6 +11,12 @@
   "cleanButtonText": {
     "message": "Nettoyer maintenant"
   },
+  "settingsTab": {
+    "message": "Paramètres"
+  },
+  "statsTab": {
+    "message": "Statistiques"
+  },
   "advancedSettingsToggleLabel": {
     "message": "Paramètres avancés"
   },

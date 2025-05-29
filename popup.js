@@ -98,6 +98,8 @@ const UIManager = {
     dataTypeCheckboxes: {},
     bookmarksCount: null,
     lastCleanedTime: null,
+    tabButtons: null, // Ajout des boutons d'onglet
+    tabContents: null, // Ajout des contenus d'onglet
   },
 
   /**
@@ -113,7 +115,9 @@ const UIManager = {
     this.elements.bookmarksCount = document.getElementById('bookmarksCount');
     this.elements.lastCleanedTime = document.getElementById('lastCleanedTime');
     this.elements.resetButton = document.getElementById('resetButton');
-    
+    this.elements.tabButtons = document.querySelectorAll('.tab-btn'); // Sélectionner tous les boutons d'onglet
+    this.elements.tabContents = document.querySelectorAll('.tab-content'); // Sélectionner tous les contenus d'onglet
+
     // Vérifier si des éléments essentiels sont manquants
     const essentialElements = ['cleanButton', 'statusMessage', 'results'];
     for (const elemId of essentialElements) {
@@ -139,15 +143,16 @@ const UIManager = {
   async loadSavedState() {
     try {
       const result = await chrome.storage.local.get({
-        showLogs: false, // Default to false as per solution
-        advancedSettingsVisible: false,
+        showLogs: false,
+        advancedSettingsVisible: false, // Maintenir pour la logique interne si nécessaire
         dataTypes: {
           cookies: true,
           cache: true,
           indexedDB: true,
           localStorage: true,
           serviceWorkers: true
-        }
+        },
+        activeTab: 'settings' // Nouvelle option pour l'onglet actif par défaut
       });
 
       // Appliquer les paramètres seulement si les éléments existent
@@ -155,7 +160,7 @@ const UIManager = {
         this.elements.showLogsToggle.checked = result.showLogs;
       }
 
-      // Paramètres avancés
+      // Paramètres avancés (le toggle reste pour la visibilité du panneau interne)
       this.toggleAdvancedSettings(result.advancedSettingsVisible);
       if (this.elements.advancedSettingsToggle) {
         this.elements.advancedSettingsToggle.checked = result.advancedSettingsVisible;
@@ -169,6 +174,9 @@ const UIManager = {
           console.warn(chrome.i18n.getMessage('checkboxNotAvailable', [type]));
         }
       });
+
+      // Activer l'onglet sauvegardé ou l'onglet par défaut
+      this.switchTab(result.activeTab);
       
       return result;
     } catch (error) {
@@ -179,7 +187,7 @@ const UIManager = {
   },
 
   /**
-   * Affiche ou masque les paramètres avancés
+   * Affiche ou masque les paramètres avancés (panneau interne)
    * @param {boolean} visible
    */
   toggleAdvancedSettings(visible) {
@@ -187,15 +195,44 @@ const UIManager = {
       this.elements.settingsPanel.style.display = visible ? 'block' : 'none';
     } else {
       console.warn(chrome.i18n.getMessage('settingsPanelNotAvailable'));
-      return;
     }
 
+    // Sauvegarder l'état du toggle des paramètres avancés
     try {
-      chrome.storage.sync.set({
+      chrome.storage.local.set({
         advancedSettingsVisible: visible
       });
     } catch (error) {
       console.error(chrome.i18n.getMessage('errorSavingAdvancedSettings'), error);
+    }
+  },
+
+  /**
+   * Bascule entre les onglets
+   * @param {string} tabId - L'ID de l'onglet à activer ('settings' ou 'stats')
+   */
+  switchTab(tabId) {
+    this.elements.tabButtons.forEach(button => {
+      if (button.dataset.tab === tabId) {
+        button.classList.add('active');
+      } else {
+        button.classList.remove('active');
+      }
+    });
+
+    this.elements.tabContents.forEach(content => {
+      if (content.id === tabId) {
+        content.classList.add('active');
+      } else {
+        content.classList.remove('active');
+      }
+    });
+
+    // Sauvegarder l'onglet actif
+    try {
+      chrome.storage.local.set({ activeTab: tabId });
+    } catch (error) {
+      console.error(chrome.i18n.getMessage('errorSavingActiveTab'), error);
     }
   },
 
@@ -518,12 +555,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
     }
 
-    if (UIManager.elements.advancedSettingsToggle) {
-      UIManager.elements.advancedSettingsToggle.addEventListener('change', (e) => {
-        UIManager.toggleAdvancedSettings(e.target.checked);
-      });
-    }
-
     // Écouter les changements dans les cases à cocher des types de données
     Object.values(UIManager.elements.dataTypeCheckboxes).forEach(checkbox => {
       if (checkbox) {
@@ -532,6 +563,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
     });
+
+    // Écouter les clics sur les boutons d'onglet
+    UIManager.elements.tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        UIManager.switchTab(button.dataset.tab);
+      });
+    });
+
+    // Écouter le toggle des paramètres avancés (pour le panneau interne)
+    if (UIManager.elements.advancedSettingsToggle) {
+      UIManager.elements.advancedSettingsToggle.addEventListener('change', (e) => {
+        UIManager.toggleAdvancedSettings(e.target.checked);
+      });
+    }
 
     // Ajouter l'événement pour le bouton de réinitialisation
     if (UIManager.elements.resetButton) {
