@@ -119,7 +119,7 @@ const UIManager = {
     this.elements.tabContents = document.querySelectorAll('.tab-content'); // Sélectionner tous les contenus d'onglet
 
     // Vérifier si des éléments essentiels sont manquants
-    const essentialElements = ['cleanButton', 'statusMessage', 'results'];
+    const essentialElements = ['cleanButton', 'statusMessage']; // 'results' a été supprimé
     for (const elemId of essentialElements) {
       if (!this.elements[elemId]) {
         console.error(chrome.i18n.getMessage('essentialElementNotFound', [elemId]));
@@ -333,15 +333,6 @@ const UIManager = {
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
 
-  /**
-   * Efface tous les résultats affichés
-   */
-  clearResults() {
-    if (this.elements.results) {
-      this.elements.results.innerHTML = '';
-    }
-    this.setStatus('');
-  },
 
   /**
    * Active/désactive le bouton de nettoyage
@@ -519,7 +510,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (UIManager.elements.showLogsToggle) {
       UIManager.elements.showLogsToggle.addEventListener('change', (event) => {
-        chrome.storage.local.set({ showLogs: event.target.checked });
+        chrome.storage.sync.set({ showLogs: event.target.checked }); // Utiliser chrome.storage.sync
       });
     }
 

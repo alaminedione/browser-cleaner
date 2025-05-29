@@ -168,10 +168,11 @@ const CleaningService = {
 
     // Ouvrir les logs si l'option est activée (géré par le service worker)
     try {
-      const { showLogs } = await chrome.storage.local.get(['showLogs']);
-      Utils.logger.debug('Valeur de showLogs:', showLogs); // Log de débogage
+      const { showLogs } = await chrome.storage.sync.get(['showLogs']); // Utiliser chrome.storage.sync
+      Utils.logger.debug('Valeur de showLogs:', showLogs);
+      // Ouvrir les logs si l'option est activée, même si le popup est fermé
       if (showLogs) {
-        Utils.logger.debug('Tentative d\'ouverture de logs.html avec logDetails:', logDetails); // Log de débogage
+        Utils.logger.debug('Tentative d\'ouverture de logs.html avec logDetails:', logDetails);
         await chrome.tabs.create({ url: chrome.runtime.getURL('logs.html?log=' + encodeURIComponent(JSON.stringify(logDetails))) });
       }
     } catch (e) {
