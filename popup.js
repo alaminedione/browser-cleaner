@@ -413,9 +413,11 @@ const CleaningManager = {
    * Exécute le processus de nettoyage
    */
    async executeCleanup() {
-     UIManager.clearResults();
      UIManager.setStatus(chrome.i18n.getMessage('statusCleaningInProgress'), 'info');
      UIManager.setCleanButtonEnabled(false);
+
+     // Ajouter un délai de 2 secondes avant de démarrer l'opération
+     await new Promise(resolve => setTimeout(resolve, 2000));
 
      try {
       // Récupérer les origines des favoris
@@ -424,13 +426,12 @@ const CleaningManager = {
         invalidUrls
       } = await BookmarkManager.getBookmarkOrigins();
 
-      // Afficher les URL invalides si nécessaire
+      // Afficher les URL invalides si nécessaire (maintenant via setStatus)
       if (invalidUrls.length > 0) {
-        UIManager.addResult(
+        UIManager.setStatus(
          chrome.i18n.getMessage('statusInvalidUrlsFound', [invalidUrls.length]),
           'warning'
         );
-        UIManager.addResultList(invalidUrls, 'warning');
       }
 
       // Récupérer les types de données sélectionnés
@@ -443,14 +444,11 @@ const CleaningManager = {
         dataTypes
       });
 
+
       UIManager.setCleanButtonEnabled(true);
-      // UIManager.setStatus(''); // Supprimer cette ligne car le statut sera mis à jour par le log
 
       if (response && response.status === "started") {
         UIManager.setStatus(chrome.i18n.getMessage('statusCleaningStartedInBackground'), 'info');
-        // Puisque le log est maintenant géré par le background script,
-        // nous devons le récupérer pour mettre à jour l'UI du popup.
-        // On attend un court instant pour que le background ait le temps de sauvegarder le log.
         setTimeout(async () => {
           const result = await chrome.storage.local.get(['lastLog']);
           const log = result.lastLog;
@@ -468,16 +466,15 @@ const CleaningManager = {
           } else {
             UIManager.setStatus(chrome.i18n.getMessage('statusNoLogAvailable'), 'warning');
           }
-        }, 500); // Délai pour laisser le temps au background de sauvegarder le log
+        }, 500);
       } else {
         UIManager.setStatus(chrome.i18n.getMessage('statusCleaningRequestFailed'), 'error');
       }
 
     } catch (error) {
-      console.error(chrome.i18n.getMessage('errorDuringCleanup'), error); // Assuming you'll add this key
+      console.error(chrome.i18n.getMessage('errorDuringCleanup'), error);
       UIManager.setCleanButtonEnabled(true);
-      UIManager.setStatus('');
-      UIManager.addResult(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
+      UIManager.setStatus(chrome.i18n.getMessage('statusGenericError', [error.message]), 'error');
     }
   }
 };
