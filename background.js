@@ -159,7 +159,7 @@ const CleaningService = {
         await Utils.showNotification(
           'success',
           chrome.i18n.getMessage('notification_cleaning_success_title'),
-          chrome.i18n.getMessage('notification_cleaning_success_detail', [excludedOrigins.length])
+          chrome.i18n.getMessage('notification_cleaning_success_detail', [logDetails.excludedOrigins.count])
         );
       } catch (notifError) {
         Utils.logger.error(chrome.i18n.getMessage('failedToShowSuccessNotification'), notifError);
