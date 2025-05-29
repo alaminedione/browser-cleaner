@@ -332,35 +332,6 @@ const UIManager = {
    * @param {string} message
    * @param {string} type - 'info', 'success', 'error', 'warning'
    */
-   addResult(message, type = 'info') {
-    if (!this.elements.results) return;
-
-    const p = document.createElement('p');
-    p.textContent = message;
-    p.classList.add(`result-${type}`);
-
-    this.elements.results.appendChild(p);
-  },
-
-  /**
-   * Ajoute une liste à la section des résultats
-   * @param {Array} items
-   * @param {string} type - 'info', 'warning', 'error'
-   */
-   addResultList(items, type = 'info') {
-    if (!items || items.length === 0 || !this.elements.results) return;
-
-    const ul = document.createElement('ul');
-    ul.classList.add(`list-${type}`);
-
-    items.forEach(item => {
-      const li = document.createElement('li');
-      li.textContent = item;
-      ul.appendChild(li);
-    });
-
-    this.elements.results.appendChild(ul);
-  },
 
   /**
    * Efface tous les résultats affichés
@@ -473,7 +444,7 @@ const CleaningManager = {
       });
 
       UIManager.setCleanButtonEnabled(true);
-      UIManager.setStatus('');
+      // UIManager.setStatus(''); // Supprimer cette ligne car le statut sera mis à jour par le log
 
       if (response && response.status === "started") {
         UIManager.setStatus(chrome.i18n.getMessage('statusCleaningStartedInBackground'), 'info');
@@ -485,21 +456,21 @@ const CleaningManager = {
           const log = result.lastLog;
           if (log) {
             if (log.success) {
-              UIManager.addResult(
+              UIManager.setStatus(
                 chrome.i18n.getMessage('statusCleaningSuccess', [log.excludedOrigins.count]),
                 'success'
               );
             } else {
-              UIManager.addResult(chrome.i18n.getMessage('statusCleaningError', [log.error.message]), 'error');
+              UIManager.setStatus(chrome.i18n.getMessage('statusCleaningError', [log.error.message]), 'error');
             }
             UIManager.updateStats(log.excludedOrigins.count, log.endTime);
             UIManager.saveLastCleanedTime(log.endTime);
           } else {
-            UIManager.addResult(chrome.i18n.getMessage('statusNoLogAvailable'), 'warning');
+            UIManager.setStatus(chrome.i18n.getMessage('statusNoLogAvailable'), 'warning');
           }
         }, 500); // Délai pour laisser le temps au background de sauvegarder le log
       } else {
-        UIManager.addResult(chrome.i18n.getMessage('statusCleaningRequestFailed'), 'error');
+        UIManager.setStatus(chrome.i18n.getMessage('statusCleaningRequestFailed'), 'error');
       }
 
     } catch (error) {
