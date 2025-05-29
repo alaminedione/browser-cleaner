@@ -75,6 +75,15 @@ const Utils = {
         Utils.logger.error(chrome.i18n.getMessage('failedToShowFallbackNotification'), fallbackError);
       }
     }
+  },
+
+  saveLog: async (logEntry) => {
+    try {
+      // Stocker uniquement le dernier log
+      await chrome.storage.local.set({ lastLog: logEntry });
+    } catch (error) {
+      console.error("Erreur de sauvegarde du log :", error);
+    }
   }
 };
 
@@ -95,7 +104,7 @@ const CleaningService = {
   },
 
   // Traite les résultats du nettoyage
-  async handleCleaningResult(port, startTime, excludedOrigins, dataTypes, error = null) {
+  async handleCleaningResult(startTime, excludedOrigins, dataTypes, error = null) {
     const endTime = new Date().toISOString();
     const logDetails = {
       operation: 'browsing-data-cleanup',
@@ -130,6 +139,9 @@ const CleaningService = {
       } : null
     };
 
+    // Sauvegarder le log
+    await Utils.saveLog(logDetails);
+
     Utils.logger.info(chrome.i18n.getMessage('cleaningOperationCompleted'), logDetails);
 
     if (error) {
@@ -142,12 +154,6 @@ const CleaningService = {
       } catch (notifError) {
         Utils.logger.error(chrome.i18n.getMessage('failedToShowErrorNotification'), notifError);
       }
-      // Vérifier si le port est toujours connecté avant d'envoyer le message
-      if (!port.disconnected) {
-        port.postMessage({ status: "error", message: error.message, log: logDetails });
-      } else {
-        Utils.logger.warn(chrome.i18n.getMessage('portDisconnectedWarning'), { status: "error", message: error.message, log: logDetails });
-      }
     } else {
       try {
         await Utils.showNotification(
@@ -158,17 +164,23 @@ const CleaningService = {
       } catch (notifError) {
         Utils.logger.error(chrome.i18n.getMessage('failedToShowSuccessNotification'), notifError);
       }
-      // Vérifier si le port est toujours connecté avant d'envoyer le message
-      if (!port.disconnected) {
-        port.postMessage({ status: "done", log: logDetails });
-      } else {
-        Utils.logger.warn(chrome.i18n.getMessage('portDisconnectedWarning'), { status: "done", log: logDetails });
+    }
+
+    // Ouvrir les logs si l'option est activée (géré par le service worker)
+    try {
+      const { showLogs } = await chrome.storage.local.get(['showLogs']);
+      Utils.logger.debug('Valeur de showLogs:', showLogs); // Log de débogage
+      if (showLogs) {
+        Utils.logger.debug('Tentative d\'ouverture de logs.html avec logDetails:', logDetails); // Log de débogage
+        await chrome.tabs.create({ url: chrome.runtime.getURL('logs.html?log=' + encodeURIComponent(JSON.stringify(logDetails))) });
       }
+    } catch (e) {
+      Utils.logger.error('Erreur lors de l\'ouverture des logs', e);
     }
   },
 
   // Exécute le nettoyage
-  async executeCleanup(port, options) {
+  async executeCleanup(options) {
     const { origins = [], dataTypes = CONFIG.defaultDataTypes } = options;
     const startTime = new Date().toISOString();
 
@@ -203,48 +215,35 @@ const CleaningService = {
       });
 
       // Traiter le résultat
-      this.handleCleaningResult(port, startTime, validOrigins, dataTypes);
+      this.handleCleaningResult(startTime, validOrigins, dataTypes);
     } catch (error) {
       Utils.logger.error(chrome.i18n.getMessage('errorDuringBrowsingDataCleanup'), error);
-      this.handleCleaningResult(port, startTime, origins, dataTypes, error);
+      this.handleCleaningResult(startTime, origins, dataTypes, error);
     }
   }
 };
 
 // Initialisation et écouteurs d'événements
 function initBrowserCleaner() {
-  // Écouter les connections port
-  chrome.runtime.onConnect.addListener((port) => {
-    if (port.name !== "clean-port") return;
+  // Écouter les messages ponctuels
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    Utils.logger.debug(chrome.i18n.getMessage('receivedMessageOnCleanupPort'), message);
 
-    Utils.logger.info(chrome.i18n.getMessage('connectedToCleanupPort'));
+    const { action, origins = [], dataTypes } = message;
 
-    // Écouter les messages sur ce port
-    port.onMessage.addListener((message) => {
-      Utils.logger.debug(chrome.i18n.getMessage('receivedMessageOnCleanupPort'), message);
-
-      const { action, origins = [], dataTypes } = message;
-
-      if (action === "clean") {
-        CleaningService.executeCleanup(port, {
-          origins,
-          dataTypes: dataTypes || CONFIG.defaultDataTypes
-        });
-      } else if (action === "getConfig") {
-        port.postMessage({
-          status: "config",
-          config: CONFIG
-        });
-      }
-    });
-
-    // Gérer la déconnexion
-    port.onDisconnect.addListener(() => {
-      Utils.logger.info(chrome.i18n.getMessage('cleanupPortDisconnected'));
-      if (chrome.runtime.lastError) {
-        Utils.logger.error(chrome.i18n.getMessage('portError'), chrome.runtime.lastError);
-      }
-    });
+    if (action === "clean") {
+      CleaningService.executeCleanup({
+        origins,
+        dataTypes: dataTypes || CONFIG.defaultDataTypes
+      });
+      sendResponse({ status: "started" }); // Répondre immédiatement que le nettoyage a commencé
+      return true; // Indiquer que la réponse sera asynchrone
+    } else if (action === "getConfig") {
+      sendResponse({
+        status: "config",
+        config: CONFIG
+      });
+    }
   });
 
   Utils.logger.info(chrome.i18n.getMessage('browserCleanerInitialized'));

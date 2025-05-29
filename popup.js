@@ -138,8 +138,8 @@ const UIManager = {
    */
   async loadSavedState() {
     try {
-      const result = await chrome.storage.sync.get({
-        showLogsEnabled: true,
+      const result = await chrome.storage.local.get({
+        showLogs: false, // Default to false as per solution
         advancedSettingsVisible: false,
         dataTypes: {
           cookies: true,
@@ -152,7 +152,7 @@ const UIManager = {
 
       // Appliquer les paramètres seulement si les éléments existent
       if (this.elements.showLogsToggle) {
-        this.elements.showLogsToggle.checked = result.showLogsEnabled;
+        this.elements.showLogsToggle.checked = result.showLogs;
       }
 
       // Paramètres avancés
@@ -380,10 +380,10 @@ const UIManager = {
   async saveSettings() {
     try {
       const dataTypes = this.getSelectedDataTypes();
-      const showLogsEnabled = this.elements.showLogsToggle?.checked || false;
+      const showLogs = this.elements.showLogsToggle?.checked || false;
 
-      await chrome.storage.sync.set({
-        showLogsEnabled,
+      await chrome.storage.local.set({
+        showLogs,
         dataTypes
       });
       
@@ -425,71 +425,45 @@ const CleaningManager = {
         UIManager.addResultList(invalidUrls, 'warning');
       }
 
-      // Établir la connexion avec le background script
-      const port = chrome.runtime.connect({ name: "clean-port" });
-
       // Récupérer les types de données sélectionnés
       const dataTypes = UIManager.getSelectedDataTypes();
 
-      // Envoyer la demande de nettoyage
-      port.postMessage({
+      // Envoyer la demande de nettoyage via un message ponctuel
+      const response = await chrome.runtime.sendMessage({
         action: "clean",
         origins,
         dataTypes
       });
 
-      // Gérer la réponse
-      port.onMessage.addListener((msg) => {
-        UIManager.setCleanButtonEnabled(true);
-        UIManager.setStatus('');
+      UIManager.setCleanButtonEnabled(true);
+      UIManager.setStatus('');
 
-        if (msg.status === "done") {
-          const domainsCount = origins.length;
-          UIManager.addResult(
-           chrome.i18n.getMessage('statusCleaningSuccess', [domainsCount]),
-            'success'
-          );
-
-          // Afficher les logs si l'option est activée
-          if (UIManager.elements.showLogsToggle?.checked && msg.log) {
-            chrome.tabs.create({
-              url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log))
-            });
+      if (response && response.status === "started") {
+        UIManager.setStatus(chrome.i18n.getMessage('statusCleaningStartedInBackground'), 'info');
+        // Puisque le log est maintenant géré par le background script,
+        // nous devons le récupérer pour mettre à jour l'UI du popup.
+        // On attend un court instant pour que le background ait le temps de sauvegarder le log.
+        setTimeout(async () => {
+          const result = await chrome.storage.local.get(['lastLog']);
+          const log = result.lastLog;
+          if (log) {
+            if (log.success) {
+              UIManager.addResult(
+                chrome.i18n.getMessage('statusCleaningSuccess', [log.excludedOrigins.count]),
+                'success'
+              );
+            } else {
+              UIManager.addResult(chrome.i18n.getMessage('statusCleaningError', [log.error.message]), 'error');
+            }
+            UIManager.updateStats(log.excludedOrigins.count, log.endTime);
+            UIManager.saveLastCleanedTime(log.endTime);
+          } else {
+            UIManager.addResult(chrome.i18n.getMessage('statusNoLogAvailable'), 'warning');
           }
-
-          // Mettre à jour les statistiques
-          UIManager.updateStats(msg.log.excludedOrigins.count, msg.log.endTime);
-          UIManager.saveLastCleanedTime(msg.log.endTime);
-
-        } else if (msg.status === "error") {
-          UIManager.addResult(chrome.i18n.getMessage('statusCleaningError', [msg.message]), 'error');
-
-          // Afficher les logs en cas d\'erreur si l\'option est activée
-          if (UIManager.elements.showLogsToggle?.checked && msg.log) {
-            chrome.tabs.create({
-              url: 'logs.html?log=' + encodeURIComponent(JSON.stringify(msg.log))
-            });
-          }
-        }
-      });
-
-      // Gérer la déconnexion
-      port.onDisconnect.addListener(() => {
-        UIManager.setCleanButtonEnabled(true);
-        UIManager.setStatus('');
-
-        if (chrome.runtime.lastError) {
-          UIManager.addResult(
-           chrome.i18n.getMessage('statusPortDisconnectedErrorDetail', [chrome.runtime.lastError.message]),
-            'error'
-          );
-        } else {
-          UIManager.addResult(
-           chrome.i18n.getMessage('statusPortDisconnectedError'),
-            'error'
-          );
-        }
-      });
+        }, 500); // Délai pour laisser le temps au background de sauvegarder le log
+      } else {
+        UIManager.addResult(chrome.i18n.getMessage('statusCleaningRequestFailed'), 'error');
+      }
 
     } catch (error) {
       console.error(chrome.i18n.getMessage('errorDuringCleanup'), error); // Assuming you'll add this key
@@ -539,8 +513,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (UIManager.elements.showLogsToggle) {
-      UIManager.elements.showLogsToggle.addEventListener('change', async () => {
-        await UIManager.saveSettings();
+      UIManager.elements.showLogsToggle.addEventListener('change', (event) => {
+        chrome.storage.local.set({ showLogs: event.target.checked });
       });
     }
 
